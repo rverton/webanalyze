@@ -32,12 +32,12 @@ type AppsDefinition struct {
 }
 
 type Match struct {
-	AppName    string
-	AppWebsite string
-	Matches    [][]string
+	AppName    string     `json:"app"`
+	AppWebsite string     `json:"app_website"`
+	Matches    [][]string `json:"matches"`
 }
 
-// custom unmarshaler for handling bogus apps.json types
+// custom unmarshaler for handling bogus apps.json types from wappalyzer
 func (t *StringArray) UnmarshalJSON(data []byte) error {
 	var s string
 	var sa []string
@@ -76,17 +76,16 @@ func downloadFile(from, to string) error {
 	return err
 }
 
-func loadApps(filename string) (*AppsDefinition, error) {
-	var appDefs AppsDefinition
-
+// load apps from file
+func LoadApps(filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
-		return &appDefs, err
+		return err
 	}
 
 	dec := json.NewDecoder(f)
 	if err = dec.Decode(&appDefs); err != nil {
-		return &appDefs, err
+		return err
 	}
 
 	// compile regular expressions
@@ -109,7 +108,7 @@ func loadApps(filename string) (*AppsDefinition, error) {
 
 	}
 
-	return &appDefs, nil
+	return nil
 }
 
 func compileRegexes(s StringArray) []*regexp.Regexp {

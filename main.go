@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -20,6 +21,20 @@ import (
 var wg sync.WaitGroup
 var appDefs *AppsDefinition
 
+var host = flag.String("host", "", "single host to test")
+var hosts = flag.String("hosts", "hosts", "list of hosts, one line per host.")
+var workers = flag.Int("worker", 50, "number of worker")
+var update = flag.Bool("update", false, "update apps file")
+var apps = flag.String("apps", "apps.json", "app definition file.")
+var useJson = flag.Bool("json", false, "output as json")
+
+type Result struct {
+	Host     string        `json:"host"`
+	Matches  []Match       `json:"matches"`
+	Duration time.Duration `json:"duration"`
+	Error    error         `json:"error"`
+}
+
 func main() {
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -27,13 +42,8 @@ func main() {
 	var file io.ReadCloser
 	var err error
 
+	results := make(chan Result)
 	c := make(chan string)
-
-	var host = flag.String("host", "", "Single host to test")
-	var hosts = flag.String("hosts", "hosts", "List of hosts. One line per host.")
-	var workers = flag.Int("worker", 50, "Number of worker.")
-	var update = flag.Bool("update", false, "Update apps file")
-	var apps = flag.String("apps", "apps.json", "app definition file.")
 
 	flag.Parse()
 
@@ -56,7 +66,7 @@ func main() {
 	}
 	defer file.Close()
 
-	appDefs, err = loadApps(*apps)
+	err = LoadApps(*apps)
 	if err != nil {
 		log.Fatalf("error: can not load app definition file: %v", err)
 	}
@@ -64,54 +74,79 @@ func main() {
 	log.Printf("Loaded %v app definitions", len(appDefs.Apps))
 	log.Printf("Scanning with %v workers.", *workers)
 
-	// start workers based on flag
-	for i := 0; i < *workers; i++ {
-		wg.Add(1)
-		go worker(i, c)
-	}
+	// start worker
+	InitWorker(*workers, c, results)
 
 	// send hosts line by line to worker channel
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		c <- scanner.Text()
+	go func() {
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			c <- scanner.Text()
+		}
+		close(c)
+		wg.Wait()
+		close(results)
+	}()
+
+	var res []Result
+
+	for result := range results {
+		if !*useJson {
+			fmt.Printf("[+] %v (%v):\n", result.Host, result.Duration)
+			for _, a := range result.Matches {
+				fmt.Printf("\t- %v\n", a.AppName)
+			}
+		} else {
+			res = append(res, result)
+		}
 	}
 
-	close(c)
-	wg.Wait()
+	if *useJson {
+		b, _ := json.Marshal(res)
+		fmt.Println(string(b))
+	}
+
 }
 
-// worker loops until channel is closed and processes a single host
-func worker(i int, c chan string) {
+// start n worker and let them listen on c for hosts to scan
+func InitWorker(count int, c chan string, results chan Result) {
+	// start workers based on flag
+	for i := 0; i < count; i++ {
+		wg.Add(1)
+		go worker(i, c, results)
+	}
+}
+
+// worker loops until channel is closed. processes a single host at once
+func worker(i int, c chan string, results chan Result) {
 
 	for host := range c {
 
-		url := host
-
-		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
-			url = fmt.Sprintf("http://%s", url)
+		if !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://") {
+			host = fmt.Sprintf("http://%s", host)
 		}
 
 		t0 := time.Now()
-		result, err := process(url)
+		result, err := process(host)
 		t1 := time.Now()
-		diff := t1.Sub(t0)
 
-		if err != nil {
-			fmt.Printf("[-] %v: %v (%v, worker %v)\n", host, err, diff, i)
-		} else {
-			fmt.Printf("[+] %v (%v, worker %v):\n", host, diff, i)
-			for _, a := range result {
-				fmt.Printf("\t- %v\n", a.AppName)
-			}
+		res := Result{
+			Host:     host,
+			Matches:  result,
+			Duration: t1.Sub(t0),
+			Error:    err,
 		}
+
+		results <- res
 
 	}
 
 	wg.Done()
 }
 
+// do http request and analyze response
 func process(host string) ([]Match, error) {
-	var apps []Match
+	var apps = make([]Match, 0)
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
