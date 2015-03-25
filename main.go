@@ -52,7 +52,9 @@ func main() {
 		if err != nil {
 			log.Fatalf("error: can not update apps file: %v", err)
 		}
-		log.Println("app definition file updated from %v", WAPPALYZER_URL)
+
+		log.Fatalln("app definition file updated from ", WAPPALYZER_URL)
+
 	}
 
 	// check single host or hosts file
@@ -84,6 +86,8 @@ func main() {
 			c <- scanner.Text()
 		}
 		close(c)
+
+		// wait for workers to finish, the close result channel to signal finish of scan
 		wg.Wait()
 		close(results)
 	}()
