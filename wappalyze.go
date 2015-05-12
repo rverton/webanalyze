@@ -16,15 +16,17 @@ type StringArray []string
 type App struct {
 	Cats    []int             `json:"cats"`
 	Headers map[string]string `json:"headers"`
+	Meta    map[string]string `json:"meta"`
 	HTML    StringArray       `json:"html"`
 	Script  StringArray       `json:"script"`
 	URL     StringArray       `json:"url"`
 	Website string            `json:"website"`
 
-	HTMLRegex   []*regexp.Regexp
-	ScriptRegex []*regexp.Regexp
-	URLRegex    []*regexp.Regexp
-	HeaderRegex map[string]*regexp.Regexp `json:"headers"`
+	HTMLRegex   []*regexp.Regexp `json:"-"`
+	ScriptRegex []*regexp.Regexp `json:"-"`
+	URLRegex    []*regexp.Regexp `json:"-"`
+	HeaderRegex []NamedRegexp    `json:"-"`
+	MetaRegex   []NamedRegexp    `json:"-"`
 }
 
 type AppsDefinition struct {
@@ -35,6 +37,11 @@ type Match struct {
 	AppName    string     `json:"app"`
 	AppWebsite string     `json:"app_website"`
 	Matches    [][]string `json:"matches"`
+}
+
+type NamedRegexp struct {
+	Name  string
+	Regex *regexp.Regexp
 }
 
 // custom unmarshaler for handling bogus apps.json types from wappalyzer
@@ -95,12 +102,45 @@ func loadApps(filename string) error {
 		app.HTMLRegex = compileRegexes(value.HTML)
 		app.ScriptRegex = compileRegexes(value.Script)
 		app.URLRegex = compileRegexes(value.URL)
+		app.HeaderRegex = []NamedRegexp{}
 
 		for key, value := range app.Headers {
-			app.HeaderRegex[key], err = regexp.Compile(value)
-			if err != nil {
-				// ignore failed compiling for now
-				// log.Printf("waring: compiling regex for header failed: %v", err)
+
+			if value == "" {
+				continue
+			}
+
+			h := NamedRegexp{
+				Name: key,
+			}
+
+			// Filter out webapplyzer attributes from regular expression
+			splitted := strings.Split(value, "\\;")
+
+			r, err := regexp.Compile(splitted[0])
+			if err == nil {
+				h.Regex = r
+				app.HeaderRegex = append(app.HeaderRegex, h)
+			}
+		}
+
+		for key, value := range app.Meta {
+
+			if value == "" {
+				continue
+			}
+
+			// Filter out webapplyzer attributes from regular expression
+			splitted := strings.Split(value, "\\;")
+
+			h := NamedRegexp{
+				Name: key,
+			}
+
+			r, err := regexp.Compile(splitted[0])
+			if err == nil {
+				h.Regex = r
+				app.MetaRegex = append(app.MetaRegex, h)
 			}
 		}
 
@@ -110,7 +150,6 @@ func loadApps(filename string) error {
 
 	return nil
 }
-
 func compileRegexes(s StringArray) []*regexp.Regexp {
 	var list []*regexp.Regexp
 

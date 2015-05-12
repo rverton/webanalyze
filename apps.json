@@ -44,6 +44,7 @@
 				6
 			],
 			"headers": {
+				"Set-Cookie": "3dvisit",
 				"X-Powered-By": "3DCART"
 			},
 			"script": "(?:twlh(?:track)?\\.asp|3d_upsell\\.js)",
@@ -57,20 +58,6 @@
 				"Server": "3ware\\/?([\\d\\.]+)?\\;version:\\1"
 			},
 			"website": "www.3ware.com"
-		},
-		"actionhero.js": {
-			"cats": [
-				1,
-				18,
-				22
-			],
-			"headers": {
-				"X-Powered-By": "actionhero API"
-			},
-			"env": "^actionheroClient$",
-			"script": "actionheroClient\\.js",
-			"implies": "node.js",
-			"website": "www.actionherojs.com"
 		},
 		"AMPcms": {
 			"cats": [
@@ -575,6 +562,18 @@
 			"script": "backbone.*\\.js",
 			"website": "documentcloud.github.com/backbone"
 		},
+		"Backdrop": {
+			"cats": [
+				1
+			],
+			"env": "^Backdrop$",
+			"excludes": "Drupal",
+			"implies": "PHP",
+			"meta": {
+				"generator": "Backdrop CMS(?: (\\d))?\\;version:\\1"
+			},
+			"website": "backdropcms.org"
+		},
 		"Banshee": {
 			"cats": [
 				1,
@@ -909,10 +908,10 @@
 				12,
 				18
 			],
+			"env": "^catberry$",
 			"headers": {
 				"X-Powered-By": "Catberry"
 			},
-			"env": "^catberry$",
 			"implies": "node.js",
 			"website": "catberry.org"
 		},
@@ -2376,6 +2375,18 @@
 			"script": "handlebars(?:\\.runtime)?(?:-v([\\d.]+?))?(?:\\.min)?\\.js\\;version:\\1",
 			"website": "handlebarsjs.com"
 		},
+		"hapi.js": {
+			"cats": [
+				18,
+				22
+			],
+			"headers": {
+				"Set-Cookie": "crumb=\\;confidence:50",
+				"Set-Cookie": "Fe26\\.2\\*\\*\\;confidence:50"
+			},
+			"implies": "node.js",
+			"website": "hapijs.com"
+		},
 		"Happy ICS Server": {
 			"cats": [
 				22
@@ -2539,6 +2550,17 @@
 			"implies": "Windows Server",
 			"website": "www.iis.net"
 		},
+		"INFOnline": {
+			"cats": [
+				10
+			],
+			"env": [
+				"^szmvars$",
+				"^iam_data$"
+			],
+			"script": "^https?://(?:[^/]+\\.)?i(?:oam|v)wbox\\.de/",
+			"website": "infonline.de"
+		},
 		"IPB": {
 			"cats": [
 				2
@@ -2572,17 +2594,6 @@
 				"generator": "ImpressPages(?: CMS)?( [\\d.]*)\\;version:\\1"
 			},
 			"website": "impresspages.org"
-		},
-		"INFOnline": {
-			"cats": [
-				10
-			],
-			"env": [
-				"^szmvars$",
-				"^iam_data$"
-			],
-			"script": "^https?://(?:[^/]+\\.)?i(?:oam|v)wbox\\.de/",
-			"website": "infonline.de"
 		},
 		"InProces": {
 			"cats": [
@@ -2942,7 +2953,7 @@
 			"meta": {
 				"generator": "Kentico CMS ([\\d.R]+ \\(build [\\d.]+\\))\\;version:\\1"
 			},
-			"website": "www.kentico.comhome.aspx"
+			"website": "www.kentico.com"
 		},
 		"KineticJS": {
 			"cats": [
@@ -3004,7 +3015,6 @@
 			"cats": [
 				1
 			],
-			"env": "^\\$K$",
 			"headers": {
 				"Set-Cookie": "koken_referrer="
 			},
@@ -3197,7 +3207,6 @@
 				"^LITHIUM$"
 			],
 			"headers": {
-				"Set-Cookie": "LiSESSIONID=",
 				"Set-Cookie": "LithiumVisitor="
 			},
 			"html": " <a [^>]+Powered by Lithium",
@@ -3409,15 +3418,15 @@
 			"cats": [
 				12
 			],
-    			"implies": [
-    			      "MongoDB",	
-			      "Express",
-			      "AngularJS",
-			      "node.js"
-			],
 			"headers": {
 				"X-Powered-CMS": "Mean\\.io"
 			},
+			"implies": [
+				"MongoDB",
+				"Express",
+				"AngularJS",
+				"node.js"
+			],
 			"website": "mean.io"
 		},
 		"MediaElement.js": {
@@ -4509,6 +4518,13 @@
 			},
 			"website": "opensolution.org"
 		},
+		"Quill": {
+			"cats": [
+				24
+			],
+			"env": "^Quill$",
+			"website": "quilljs.com"
+		},
 		"RAID HTTPServer": {
 			"cats": [
 				22
@@ -4659,6 +4675,22 @@
 			"script": "rickshaw(\\.min)?\\.js",
 			"website": "code.shutterstock.com/rickshaw/"
 		},
+		"RightJS": {
+			"cats": [
+				12
+			],
+			"env": "^RightJS$",
+			"script": "right\\.js",
+			"website": "rightjs.org"
+		},
+        "Riot": {
+            "cats": [
+                12
+            ],
+            "env": "^riot$",
+            "script": "riot(?:\\+compiler)?(:?\\.min)?\\.js",
+            "website": "muut.com/riotjs"
+        },
 		"RiteCMS": {
 			"cats": [
 				1
@@ -5742,6 +5774,16 @@
 			"url": "/umbraco/login\\.aspx(?:$|\\?)",
 			"website": "umbraco.com"
 		},
+	    "Unbounce": {
+			"cats": [
+				1,
+			  	20
+			],
+			"headers": {
+			  "X-Unbounce-PageId": ""
+			},
+		  	"website": "unbounce.com"
+		},
 		"Underscore.js": {
 			"cats": [
 				12
@@ -6187,6 +6229,7 @@
 			"meta": {
 				"generator": "WordPress( [\\d.]+)?\\;version:\\1"
 			},
+			"script": "/wp-includes/",
 			"website": "wordpress.org"
 		},
 		"WordPress Super Cache": {
@@ -6506,6 +6549,20 @@
 				"Server": "^Zope/"
 			},
 			"website": "zope.org"
+		},
+		"actionhero.js": {
+			"cats": [
+				1,
+				18,
+				22
+			],
+			"env": "^actionheroClient$",
+			"headers": {
+				"X-Powered-By": "actionhero API"
+			},
+			"implies": "node.js",
+			"script": "actionheroClient\\.js",
+			"website": "www.actionherojs.com"
 		},
 		"amCharts": {
 			"cats": [
@@ -7295,19 +7352,7 @@
 		"50": "document-management-systems"
 	}
 }
-"LC399" class="blob-code js-file-line">			],</td>
-      </tr>
-      <tr>
-        <td id="L400" class="blob-num js-line-number" data-line-number="400"></td>
-        <td id="LC400" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>html<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>&lt;style[^&gt;]+static/hadoop<span class="pl-pds">&quot;</span></span>,</td>
-      </tr>
-      <tr>
-        <td id="L401" class="blob-num js-line-number" data-line-number="401"></td>
-        <td id="LC401" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>website<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>hadoop.apache.org<span class="pl-pds">&quot;</span></span></td>
-      </tr>
-      <tr>
-        <td id="L402" class="blob-num js-line-number" data-line-number="402"></td>
-        <td id="LC402" class="blob-code js-file-line">		},</td>
+">		},</td>
       </tr>
       <tr>
         <td id="L403" class="blob-num js-line-number" data-line-number="403"></td>
