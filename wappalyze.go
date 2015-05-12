@@ -1,4 +1,4 @@
-package main
+package webanalyze
 
 import (
 	"encoding/json"
@@ -63,10 +63,10 @@ func (t *StringArray) UnmarshalJSON(data []byte) error {
 }
 
 func updateApps(url string) error {
-	return downloadFile(url, WAPPALYZER_URL)
+	return DownloadFile(url, WAPPALYZER_URL)
 }
 
-func downloadFile(from, to string) error {
+func DownloadFile(from, to string) error {
 
 	resp, err := http.Get(from)
 	if err != nil {

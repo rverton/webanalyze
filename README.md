@@ -4,7 +4,7 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 
 ## Installation and usage
 
-    $ go install github.com/rverton/webanalyze
+    $ go get -u github.com/rverton/webanalyze/...
     $ webanalyze -update
     $ webanalyze -h
     Usage of ./webanalyze:
@@ -12,15 +12,19 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
       -host="": Single host to test
       -hosts="filename": List of hosts. One line per url.
       -update=false: Update apps file
-      -worker=50: Number of worker.
+      -worker=4: Number of worker.
 
-The -update flags downloads a current version of apps.json from the wappalyzer repository.
+The -update flags downloads a current version of apps.json from the wappalyzer repository in the current folder.
+
+## Development
+
+See cmd/webanalyze/main.go for an example.
 
 ## Example
 
     $ webanalyze -host="http://stackshare.io"
     2015/05/12 09:27:12 Loaded 752 app definitions
-    2015/05/12 09:27:12 Scanning with 50 workers.
+    2015/05/12 09:27:12 Scanning with 4 workers.
     [+] http://stackshare.io (1.722697135s):
         - Glyphicons
         - Google Font API
