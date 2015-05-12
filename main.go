@@ -29,7 +29,7 @@ var apps = flag.String("apps", "apps.json", "app definition file.")
 var useJson = flag.Bool("json", false, "output as json")
 
 type Result struct {
-	Host     string        `json:"host"`
+	Host     string        `json:"-"`
 	Matches  []Match       `json:"matches"`
 	Duration time.Duration `json:"duration"`
 	Error    error         `json:"error"`
@@ -68,7 +68,7 @@ func main() {
 	}
 	defer file.Close()
 
-	err = LoadApps(*apps)
+	err = loadApps(*apps)
 	if err != nil {
 		log.Fatalf("error: can not load app definition file: %v", err)
 	}
@@ -92,7 +92,7 @@ func main() {
 		close(results)
 	}()
 
-	var res []Result
+	res := make(map[string]Result)
 
 	for result := range results {
 		if !*useJson {
@@ -101,7 +101,7 @@ func main() {
 				fmt.Printf("\t- %v\n", a.AppName)
 			}
 		} else {
-			res = append(res, result)
+			res[result.Host] = result
 		}
 	}
 

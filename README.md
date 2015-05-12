@@ -16,6 +16,15 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 
 The -update flags downloads a current version of apps.json from the wappalyzer repository.
 
-## Use as a library
+## Example
 
-See the main\_test.go file for an example on how to integrate.
+    $ webanalyze -host="http://stackshare.io"
+    2015/05/12 09:27:12 Loaded 752 app definitions
+    2015/05/12 09:27:12 Scanning with 50 workers.
+    [+] http://stackshare.io (1.722697135s):
+        - Glyphicons
+        - Google Font API
+        - RequireJS
+        - Font Awesome
+        - Prototype
+        - jQuery

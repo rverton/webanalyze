@@ -77,7 +77,7 @@ func downloadFile(from, to string) error {
 }
 
 // load apps from file
-func LoadApps(filename string) error {
+func loadApps(filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
