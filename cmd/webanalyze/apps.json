@@ -507,7 +507,7 @@
 				"Set-cookie": "FESESSIONID"
 			},
 			"html": "<title>(?:Log in to )?FishEye (?:and Crucible )?([\\d.]+)?</title>\\;version:\\1",
-			"website": "www.atlassian.com/software/fisheyet/overview/"
+			"website": "www.atlassian.com/software/fisheye/overview/"
 		},
 		"Atlassian Jira": {
 			"cats": [
@@ -1240,7 +1240,8 @@
 				1
 			],
 			"headers": {
-				"Set-Cookie": "CraftSessionId="
+				"Set-Cookie": "CraftSessionId=",
+				"X-Powered-By": "Craft CMS"
 			},
 			"implies": "PHP",
 			"website": "buildwithcraft.com"
@@ -1302,6 +1303,20 @@
 			],
 			"script": "dhtmlxcommon\\.js",
 			"website": "dhtmlx.com"
+		},
+		"Discuz! X": {
+			"cats": [
+				2
+			],
+			"meta": {
+				"generator": "Discuz! X([\\d\\.]+)?\\;version:\\1"
+			},
+			"env": [
+				"^discuz_uid$",
+				"^DISCUZCODE$"
+			],
+			"implies": "PHP",
+			"website": "discuz.com"
 		},
 		"DTG": {
 			"cats": [
@@ -1518,23 +1533,30 @@
 			},
 			"website": "www.dokuwiki.org"
 		},
-		"DotNetNuke": {
+		"DNN": {
 			"cats": [
 				1
 			],
 			"env": "^DotNetNuke$",
 			"headers": {
 				"DNNOutputCache": "",
+				"Cookie": "dnn_IsMobile=",
 				"Set-Cookie": "DotNetNukeAnonymous=",
 				"X-Compressed-By": "DotNetNuke"
 			},
-			"html": "<!-- by DotNetNuke Corporation",
+			"html": [
+				"<!-- by DotNetNuke Corporation",
+				"<!-- DNN Platform"
+			],
 			"implies": "Microsoft ASP.NET",
 			"meta": {
 				"generator": "DotNetNuke"
 			},
-			"script": "/js/dnncore\\.js",
-			"website": "dotnetnuke.com"
+			"script": [
+				"/js/dnncore\\.js",
+				"/js/dnn\\.js"
+			],
+			"website": "dnnsoftware.com"
 		},
 		"Dotclear": {
 			"cats": [
@@ -1582,7 +1604,7 @@
 			"cats": [
 				6
 			],
-			"html": "<[^]+(?:id=\"block[_-]commerce[_-]cart[_-]cart|class=\"commerce[_-]product[_-]field)",
+			"html": "<[^>]+(?:id=\"block[_-]commerce[_-]cart[_-]cart|class=\"commerce[_-]product[_-]field)",
 			"implies": "Drupal",
 			"website": "drupalcommerce.org"
 		},
@@ -2265,12 +2287,24 @@
 			},
 			"website": "www.grandstream.com"
 		},
+		"Grav": {
+			"cats": [
+				1
+			],
+			"implies": [
+				"PHP"
+			],
+			"meta": {
+				"generator": "Grav(?:\\s([\\d.]+))?\\;version:\\1"
+			},
+			"website": "getgrav.org"
+		},
 		"Gravatar": {
 			"cats": [
 				19
 			],
 			"env": "^Gravatar$",
-			"html": "<[^]+gravatar\\.com/avatar/",
+			"html": "<[^>]+gravatar\\.com/avatar/",
 			"website": "gravatar.com"
 		},
 		"Gravity Insights": {
@@ -2349,6 +2383,16 @@
 			},
 			"website": "hp.com"
 		},
+		"HTTP Kit": {
+			"cats": [
+				22
+			],
+			"headers": {
+				"Server": "^http-kit"
+			},
+			"implies": "Java",
+			"website": "http-kit.org"
+		},
 		"HTTP-Server": {
 			"cats": [
 				22
@@ -2374,18 +2418,6 @@
 			"html": "<[^>]*type=[^>]text\\/x-handlebars-template",
 			"script": "handlebars(?:\\.runtime)?(?:-v([\\d.]+?))?(?:\\.min)?\\.js\\;version:\\1",
 			"website": "handlebarsjs.com"
-		},
-		"hapi.js": {
-			"cats": [
-				18,
-				22
-			],
-			"headers": {
-				"Set-Cookie": "crumb=\\;confidence:50",
-				"Set-Cookie": "Fe26\\.2\\*\\*\\;confidence:50"
-			},
-			"implies": "node.js",
-			"website": "hapijs.com"
 		},
 		"Happy ICS Server": {
 			"cats": [
@@ -2419,6 +2451,16 @@
 			"env": "^HelloBar$",
 			"script": "hellobar\\.js",
 			"website": "hellobar.com"
+		},
+		"HHVM": {
+			"cats": [
+				22
+			],
+			"headers": {
+				"X-Powered-By": "HHVM/?([\\d.]+)?\\;version:\\1"
+			},
+			"website": "hhvm.com",
+			"implies": "PHP\\;confidence:50"
 		},
 		"Hiawatha": {
 			"cats": [
@@ -2491,7 +2533,7 @@
 			"headers": {
 				"Set-Cookie": "_hybris"
 			},
-			"html": "<[^]+(?:/sys_master/|/hybr/|/_ui/desktop/)",
+			"html": "<[^>]+(?:/sys_master/|/hybr/|/_ui/desktop/)",
 			"implies": "Java",
 			"website": "hybris.com"
 		},
@@ -3350,6 +3392,15 @@
 			"implies": "PHP",
 			"website": "modxcms.com"
 		},
+		"MadAdsMedia": {
+			"cats": [
+				36
+				],
+			"env": "^setM(?:Iframe|RefURL)$",
+			"script": "^https?://(?:ads-by|pixel)\\.madadsmedia.com/",
+			"website": "madadsmedia.com"
+
+		},
 		"Magento": {
 			"cats": [
 				6
@@ -3396,6 +3447,15 @@
 			"env": "^Munchkin$",
 			"script": "munchkin\\.marketo\\.net/munchkin\\.js",
 			"website": "www.marketo.com"
+		},
+		"Materialize CSS": {
+			"cats": [
+				18
+			],
+			"html": "<link[^>]* href=\"[^\"]*materialize(?:\\.min)?\\.css",
+			"implies": "jQuery",
+			"script": "materialize(?:\\.min)?\\.js",	
+			"website": "materializecss.com"
 		},
 		"MathJax": {
 			"cats": [
@@ -3713,12 +3773,12 @@
 			"implies": "PHP",
 			"website": "moodle.org"
 		},
-		"Moogo": {
+		"Kotisivukone": {
 			"cats": [
 				1
 			],
 			"script": "kotisivukone(?:\\.min)?\\.js",
-			"website": "www.moogo.com"
+			"website": "www.kotisivukone.fi"
 		},
 		"Motion-httpd": {
 			"cats": [
@@ -3892,6 +3952,24 @@
 				"Server": "nginx(?:/([\\d.]+))?\\;version:\\1"
 			},
 			"website": "nginx.org"
+		},
+		"Odoo": {
+			"cats": [
+				1,
+				6
+			],
+			"implies": [
+				"Python",
+				"PostgreSQL",
+				"node.js",
+				"Less"
+			],
+			"meta": {
+				"generator": "Odoo"
+			},
+			"script": "/web/js/(?:web\\.assets_common/|website\\.assets_frontend/)\\;confidence:25",
+			"html": "<link[^>]* href=[^>]+/web/css/(?:web\\.assets_common/|website\\.assets_frontend/)\\;confidence:25",
+			"website": "odoo.com"
 		},
 		"OWL Carousel": {
 			"cats": [
@@ -4130,6 +4208,16 @@
 				"Server": "Oracle(?:AS)?[- ]Web[- ]Cache(?:[- /]([\\da-z./]+))?\\;version:\\1"
 			},
 			"website": "oracle.com"
+		},
+		"Orchard CMS": {
+			"cats": [
+				1
+			],
+			"implies": "Microsoft ASP.NET",
+			"meta": {
+				"generator": "Orchard"
+			},
+			"website": "orchardproject.net"
 		},
 		"Outbrain": {
 			"cats": [
@@ -4438,7 +4526,7 @@
 			"script": "prefixfree\\.js",
 			"website": "leaverou.github.io/prefixfree/"
 		},
-		"Prestashop": {
+		"PrestaShop": {
 			"cats": [
 				6
 			],
@@ -4683,14 +4771,14 @@
 			"script": "right\\.js",
 			"website": "rightjs.org"
 		},
-        "Riot": {
-            "cats": [
-                12
-            ],
-            "env": "^riot$",
-            "script": "riot(?:\\+compiler)?(:?\\.min)?\\.js",
-            "website": "muut.com/riotjs"
-        },
+		"Riot": {
+			"cats": [
+				12
+			],
+			"env": "^riot$",
+			"script": "riot(?:\\+compiler)?(:?\\.min)?\\.js",
+			"website": "muut.com/riotjs"
+		},
 		"RiteCMS": {
 			"cats": [
 				1
@@ -4703,6 +4791,17 @@
 				"generator": "^RiteCMS(?: (.+))?\\;version:\\1"
 			},
 			"website": "ritecms.com"
+		},
+		"Roadiz CMS": {
+			"cats": [
+				1,
+				11
+			],
+			"implies": "PHP",
+			"meta": {
+				"generator": "^Roadiz ([a-z0-9\\s\\.]+) - \\;version:\\1"
+			},
+			"website": "www.roadiz.io"
 		},
 		"RoundCube": {
 			"cats": [
@@ -4901,6 +5000,14 @@
 			},
 			"website": "scientificlinux.org"
 		},
+		"Select2": {
+			"cats": [
+				12
+			],
+			"implies": "jQuery",
+			"script": "select2.*\\.js",
+			"website": "select2.github.io"
+		},
 		"Sencha Touch": {
 			"cats": [
 				12,
@@ -5015,11 +5122,11 @@
 			"cats": [
 				6
 			],
-			"implies": "PHP",
+			"implies": [ "PHP", "MySQL", "jQuery" ],
 			"meta": {
 				"application-name": "Shopware"
 			},
-			"script": "shopware\\.js",
+			"script": "(?:(shopware)|/web/cache/[0-9]{10}_.+)\\.js\\;version:\\1?4:5",
 			"website": "shopware.com"
 		},
 		"Silva": {
@@ -5460,6 +5567,17 @@
 			"url": "/neos/",
 			"website": "neos.typo3.org"
 		},
+		"Taiga": {
+			"cats": [
+				13
+			],
+			"implies": [
+				"Django",
+				"AngularJS"
+			],
+			"env": "^taigaConfig$",
+			"website": "taiga.io"
+		},
 		"Tealeaf": {
 			"cats": [
 				10
@@ -5774,15 +5892,15 @@
 			"url": "/umbraco/login\\.aspx(?:$|\\?)",
 			"website": "umbraco.com"
 		},
-	    "Unbounce": {
+		"Unbounce": {
 			"cats": [
 				1,
-			  	20
+				20
 			],
 			"headers": {
-			  "X-Unbounce-PageId": ""
+				"X-Unbounce-PageId": ""
 			},
-		  	"website": "unbounce.com"
+			"website": "unbounce.com"
 		},
 		"Underscore.js": {
 			"cats": [
@@ -6012,6 +6130,16 @@
 			"implies": "WordPress",
 			"website": "wp-rocket.me"
 		},
+		"Warp": {
+			"cats": [
+				22
+			],
+			"headers": {
+				"Server": "^Warp/(\\d+(?:\\.\\d+)+)?$;version:\\1"
+			},
+			"implies": "Haskell",
+			"website": "www.stackage.org/package/warp"
+		},
 		"Web Optimizer": {
 			"cats": [
 				10
@@ -6048,6 +6176,13 @@
 				"generator": "^WebGUI ([\\d.]+)\\;version:\\1"
 			},
 			"website": "www.webgui.org"
+		},
+		"webpack": {
+			"cats": [
+				44
+			],
+			"env": "^webpackJsonp$",
+			"website": "webpack.github.io"
 		},
 		"WebPublisher": {
 			"cats": [
@@ -6418,17 +6553,6 @@
 			"script": "mc\\.yandex\\.ru\\/metrika\\/watch\\.js",
 			"website": "metrika.yandex.com"
 		},
-		"Yesod": {
-			"cats": [
-				18,
-				22
-			],
-			"headers": {
-				"Server": "Warp/\\d+(\\.\\d+)+"
-			},
-			"implies": "Haskell",
-			"website": "www.yesodweb.com"
-		},
 		"Yieldlab": {
 			"cats": [
 				36
@@ -6447,6 +6571,15 @@
 				"PHP"
 			],
 			"website": "yiiframework.com"
+		},
+		"Yoast SEO": {
+			"cats": [
+				32
+			],
+			"html": [
+				"<!-- This site is optimized with the Yoast"
+			],
+			"website": "yoast.com"
 		},
 		"YouTube": {
 			"cats": [
@@ -6594,7 +6727,7 @@
 			"cats": [
 				19
 			],
-			"html": "<[^]+id='cgit'",
+			"html": "<[^>]+id='cgit'",
 			"implies": "Perl",
 			"website": "git.zx2c4.com/cgit"
 		},
@@ -6719,6 +6852,17 @@
 				"Python"
 			],
 			"website": "gunicorn.org"
+		},
+		"hapi.js": {
+			"cats": [
+				18,
+				22
+			],
+			"headers": {
+				"Set-Cookie": "Fe26\\.2\\*\\*\\;confidence:50"
+			},
+			"implies": "node.js",
+			"website": "hapijs.com"
 		},
 		"iCongo": {
 			"cats": [
@@ -7352,42 +7496,7 @@
 		"50": "document-management-systems"
 	}
 }
-">		},</td>
-      </tr>
-      <tr>
-        <td id="L403" class="blob-num js-line-number" data-line-number="403"></td>
-        <td id="LC403" class="blob-code js-file-line">		<span class="pl-s1"><span class="pl-pds">&quot;</span>Apache JSPWiki<span class="pl-pds">&quot;</span></span>: {</td>
-      </tr>
-      <tr>
-        <td id="L404" class="blob-num js-line-number" data-line-number="404"></td>
-        <td id="LC404" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>cats<span class="pl-pds">&quot;</span></span>: [</td>
-      </tr>
-      <tr>
-        <td id="L405" class="blob-num js-line-number" data-line-number="405"></td>
-        <td id="LC405" class="blob-code js-file-line">				<span class="pl-c1">8</span></td>
-      </tr>
-      <tr>
-        <td id="L406" class="blob-num js-line-number" data-line-number="406"></td>
-        <td id="LC406" class="blob-code js-file-line">			],</td>
-      </tr>
-      <tr>
-        <td id="L407" class="blob-num js-line-number" data-line-number="407"></td>
-        <td id="LC407" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>html<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>&lt;html[^&gt;]* xmlns:jspwiki=<span class="pl-pds">&quot;</span></span>,</td>
-      </tr>
-      <tr>
-        <td id="L408" class="blob-num js-line-number" data-line-number="408"></td>
-        <td id="LC408" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>script<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>jspwiki<span class="pl-pds">&quot;</span></span>,</td>
-      </tr>
-      <tr>
-        <td id="L409" class="blob-num js-line-number" data-line-number="409"></td>
-        <td id="LC409" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>url<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>wiki<span class="pl-cce">\\</span>.jsp<span class="pl-pds">&quot;</span></span>,</td>
-      </tr>
-      <tr>
-        <td id="L410" class="blob-num js-line-number" data-line-number="410"></td>
-        <td id="LC410" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>website<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>jspwiki.org<span class="pl-pds">&quot;</span></span></td>
-      </tr>
-      <tr>
-        <td id="L411" class="blob-num js-line-number" data-line-number="411"></td>
+"blob-num js-line-number" data-line-number="411"></td>
         <td id="LC411" class="blob-code js-file-line">		},</td>
       </tr>
       <tr>

@@ -11,7 +11,7 @@ var wg sync.WaitGroup
 var appDefs *AppsDefinition
 
 type Result struct {
-	Host     string        `json:"-"`
+	Host     string        `json:"host"`
 	Matches  []Match       `json:"matches"`
 	Duration time.Duration `json:"duration"`
 	Error    error         `json:"error"`

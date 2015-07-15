@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" ng-app="webanalyze">
+
+    <head>
+
+        <title>Webanalyze Result Dashboard</title>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.css">
+
+        <style>
+            .container {
+                margin-top:20px
+            }
+            form {
+                margin-top:20px;
+            }
+        </style>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+        <script id="hosts" type="text/json" src="./hosts.json"></script>
+
+        <script>
+
+        angular.module('webanalyze', [])
+        .controller('WebanalyzeCtrl', function($http) {
+            var wa = this;
+
+            wa.hosts = [];
+
+            $http.get('./hosts.json').
+                success(function(data, status, headers, config) {
+                    wa.hosts = data;
+                }).
+                error(function(data, status, headers, config) {
+                    alert('Can not load hosts.json. Create it with ./webanalyze --json > hosts.json');
+                });
+        });
+
+        </script>
+    </head>
+
+    <body ng-controller="WebanalyzeCtrl as webanalyze">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-sm-9">
+                    <h2>Webanalyze Result Dashboard</h2>
+                </div>
+                <div class="col-sm-3">
+                    <form>
+                        <input type="search" ng-model="search" class="pull-right form-control" placeholder="Search">
+                    </form>
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="col-md-5">Hostname</th>
+                        <th class="col-md-7">Apps</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr ng-repeat="host in webanalyze.hosts|filter:search">
+                        <td>{{host.host}}</td>
+                        <td>
+                            <ul class="list-unstyled">
+                                <li ng-repeat="app in host.matches" ng-init="matches[$index] = false">
+                                    <a ng-click="matches[$index] = !matches[$index]" style="cursor:pointer">{{app.app}} <i class="caret"></i></a>
+
+                                    <ul ng-show="matches[$index]">
+                                        <li ng-repeat="m in app.matches">
+                                            {{m}}
+                                        </li>
+                                    </ul>
+
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </body>
+
+</html>

@@ -63,7 +63,7 @@ func main() {
 
 	log.Printf("Scanning with %v workers.", *workers)
 
-	res := make(map[string]webanalyze.Result)
+	var res []webanalyze.Result
 
 	for result := range results {
 		if !*useJson {
@@ -75,7 +75,7 @@ func main() {
 				fmt.Printf("\t<no results>\n")
 			}
 		} else {
-			res[result.Host] = result
+			res = append(res, result)
 		}
 	}
 

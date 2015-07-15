@@ -1,6 +1,6 @@
 # webanalyze
 
-This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. This tool is designed to be performant and allows to test huge lists of hosts. 
+This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. This tool is designed to be performant and allows to test huge lists of hosts.
 
 ## Installation and usage
 
@@ -16,7 +16,11 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 
 The -update flags downloads a current version of apps.json from the wappalyzer repository in the current folder.
 
-## Development
+## Display
+
+Run cmd/webanalyze/index.html (on sth. like SimpleHTTPServer) to display results in a searchable dashboard.
+
+## Development / Usage as a lib
 
 See cmd/webanalyze/main.go for an example.
 
