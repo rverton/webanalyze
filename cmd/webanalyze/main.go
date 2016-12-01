@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -21,6 +22,7 @@ var (
 	apps    string
 	update  bool
 	useJSON bool
+	useCSV  bool
 )
 
 func init() {
@@ -30,6 +32,7 @@ func init() {
 	flag.BoolVar(&update, "update", false, "update apps file")
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
 	flag.BoolVar(&useJSON, "json", false, "output as json")
+	flag.BoolVar(&useCSV, "csv", false, "output as csv")
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
 	} else {
@@ -77,19 +80,56 @@ func main() {
 
 	log.Printf("Scanning with %v workers.", workers)
 
-	var res []webanalyze.Result
+	var (
+		res       []webanalyze.Result
+		out       *os.File
+		outWriter *csv.Writer
+	)
+
+	if useCSV {
+		out, err = os.Create("webanalyze-output.csv")
+		if err != nil {
+			log.Println("error creating file:", err)
+			return
+		}
+		defer out.Close()
+
+		outWriter = csv.NewWriter(out)
+		defer outWriter.Flush()
+
+		outWriter.Write([]string{"Host", "Category", "App"})
+	}
 
 	for result := range results {
-			fmt.Printf("[+] %v (%v):\n", result.Host, result.Duration)
+		res = append(res, result)
 		if !useJSON {
+			log.Printf("[+] %v (%v):\n", result.Host, result.Duration)
 			for _, a := range result.Matches {
-				fmt.Printf("\t- %v\n", a.AppName)
+				log.Printf("\t- %v\t - %v\n", a.AppName, a.App.Cats)
 			}
 			if len(result.Matches) <= 0 {
-				fmt.Printf("\t<no results>\n")
+				log.Printf("\t<no results>\n")
 			}
-		} else {
-			res = append(res, result)
+		}
+
+		if useCSV {
+			for _, m := range result.Matches {
+				for _, c := range m.Cats {
+					var catName string
+					var ok bool
+					if catName, ok = webanalyze.AppDefs.Cats[c]; !ok {
+						catName = fmt.Sprintf("%d", c)
+					}
+					outWriter.Write(
+						[]string{
+							result.Host,
+							catName,
+							m.AppName,
+						},
+					)
+				}
+			}
+			outWriter.Flush()
 		}
 	}
 
