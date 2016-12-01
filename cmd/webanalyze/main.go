@@ -16,23 +16,23 @@ import (
 )
 
 var (
+	update  bool
+	useCSV  bool
+	useJSON bool
 	workers int
+	apps    string
 	host    string
 	hosts   string
-	apps    string
-	update  bool
-	useJSON bool
-	useCSV  bool
 )
 
 func init() {
+	flag.BoolVar(&useCSV, "csv", false, "output as csv")
+	flag.BoolVar(&useJSON, "json", false, "output as json")
+	flag.BoolVar(&update, "update", false, "update apps file")
+	flag.IntVar(&workers, "worker", 4, "number of worker")
+	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "list of hosts to test, one host per line.")
-	flag.IntVar(&workers, "worker", 4, "number of worker")
-	flag.BoolVar(&update, "update", false, "update apps file")
-	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
-	flag.BoolVar(&useJSON, "json", false, "output as json")
-	flag.BoolVar(&useCSV, "csv", false, "output as csv")
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
 	} else {
