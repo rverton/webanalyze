@@ -14,14 +14,22 @@ import (
 	"github.com/rverton/webanalyze"
 )
 
-var host = flag.String("host", "", "single host to test")
-var hosts = flag.String("hosts", "hosts", "list of hosts to test, one host per line.")
-var workers = flag.Int("worker", 4, "number of worker")
-var update = flag.Bool("update", false, "update apps file")
-var apps = flag.String("apps", "apps.json", "app definition file.")
-var useJson = flag.Bool("json", false, "output as json")
+var (
+	workers int
+	host    string
+	hosts   string
+	apps    string
+	update  bool
+	useJSON bool
+)
 
 func init() {
+	flag.StringVar(&host, "host", "", "single host to test")
+	flag.StringVar(&hosts, "hosts", "hosts", "list of hosts to test, one host per line.")
+	flag.IntVar(&workers, "worker", 4, "number of worker")
+	flag.BoolVar(&update, "update", false, "update apps file")
+	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
+	flag.BoolVar(&useJSON, "json", false, "output as json")
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
 	} else {
@@ -35,8 +43,13 @@ func main() {
 
 	flag.Parse()
 
-	if *update {
-		err := webanalyze.DownloadFile(webanalyze.WAPPALYZER_URL, "apps.json")
+	if !update && host == "" && hosts == "" {
+		flag.Usage()
+		return
+	}
+
+	if update {
+		err = webanalyze.DownloadFile(webanalyze.WAPPALYZER_URL, "apps.json")
 		if err != nil {
 			log.Fatalf("error: can not update apps file: %v", err)
 		}
@@ -46,29 +59,29 @@ func main() {
 	}
 
 	// check single host or hosts file
-	if *host != "" {
-		file = ioutil.NopCloser(strings.NewReader(*host))
+	if host != "" {
+		file = ioutil.NopCloser(strings.NewReader(host))
 	} else {
-		file, err = os.Open(*hosts)
+		file, err = os.Open(hosts)
 		if err != nil {
-			log.Fatalf("error: can not open host file %s: %s", *hosts, err)
+			log.Fatalf("error: can not open host file %s: %s", hosts, err)
 		}
 	}
 	defer file.Close()
 
-	results, err := webanalyze.Init(*workers, file, *apps)
+	results, err := webanalyze.Init(workers, file, apps)
 
 	if err != nil {
 		log.Println("error initializing:", err)
 	}
 
-	log.Printf("Scanning with %v workers.", *workers)
+	log.Printf("Scanning with %v workers.", workers)
 
 	var res []webanalyze.Result
 
 	for result := range results {
-		if !*useJson {
 			fmt.Printf("[+] %v (%v):\n", result.Host, result.Duration)
+		if !useJSON {
 			for _, a := range result.Matches {
 				fmt.Printf("\t- %v\n", a.AppName)
 			}
@@ -80,9 +93,8 @@ func main() {
 		}
 	}
 
-	if *useJson {
+	if useJSON {
 		b, _ := json.Marshal(res)
-		fmt.Println(string(b))
+		log.Println(string(b))
 	}
-
 }
