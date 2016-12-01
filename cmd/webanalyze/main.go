@@ -52,12 +52,12 @@ func main() {
 	}
 
 	if update {
-		err = webanalyze.DownloadFile(webanalyze.WAPPALYZER_URL, "apps.json")
+		err = webanalyze.DownloadFile(webanalyze.WappalyzerURL, "apps.json")
 		if err != nil {
 			log.Fatalf("error: can not update apps file: %v", err)
 		}
 
-		log.Fatalln("app definition file updated from ", webanalyze.WAPPALYZER_URL)
+		log.Fatalln("app definition file updated from ", webanalyze.WappalyzerURL)
 
 	}
 
@@ -135,6 +135,6 @@ func main() {
 
 	if useJSON {
 		b, _ := json.Marshal(res)
-		log.Println(string(b))
+		fmt.Println(string(b))
 	}
 }

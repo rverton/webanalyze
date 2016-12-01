@@ -9,7 +9,8 @@ import (
 	"strings"
 )
 
-const wappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/apps.json"
+// WappalyzerURL is the link to the latest apps.json file in the Wappalyzer repo
+const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/apps.json"
 
 // StringArray type is a wrapper for []string for use in unmarshalling the apps.json
 type StringArray []string
@@ -69,10 +70,10 @@ func (t *StringArray) UnmarshalJSON(data []byte) error {
 }
 
 func updateApps(url string) error {
-	return DownloadFile(url, wappalyzerURL)
+	return DownloadFile(url, WappalyzerURL)
 }
 
-// DownloadFile pulls the latest apps.json file from the Wappalyzer github repo
+// DownloadFile pulls the latest apps.json file from the Wappalyzer github
 func DownloadFile(from, to string) error {
 	resp, err := http.Get(from)
 	if err != nil {
