@@ -8,7 +8,7 @@ import (
 )
 
 var wg sync.WaitGroup
-var appDefs *AppsDefinition
+var AppDefs *AppsDefinition
 
 type Result struct {
 	Host     string        `json:"host"`

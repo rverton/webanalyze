@@ -69,7 +69,7 @@ func process(host string) ([]Match, error) {
 	body, _ := ioutil.ReadAll(resp.Body)
 	doc, _ := goquery.NewDocumentFromReader(bytes.NewReader(body))
 
-	for appname, app := range appDefs.Apps {
+	for appname, app := range AppDefs.Apps {
 
 		findings := Match{
 			AppName:    appname,

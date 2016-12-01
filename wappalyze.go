@@ -91,14 +91,14 @@ func loadApps(filename string) error {
 	}
 
 	dec := json.NewDecoder(f)
-	if err = dec.Decode(&appDefs); err != nil {
+	if err = dec.Decode(&AppDefs); err != nil {
 		return err
 	}
 
 	// compile regular expressions
-	for key, value := range appDefs.Apps {
+	for key, value := range AppDefs.Apps {
 
-		app := appDefs.Apps[key]
+		app := AppDefs.Apps[key]
 		app.HTMLRegex = compileRegexes(value.HTML)
 		app.ScriptRegex = compileRegexes(value.Script)
 		app.URLRegex = compileRegexes(value.URL)
@@ -144,7 +144,7 @@ func loadApps(filename string) error {
 			}
 		}
 
-		appDefs.Apps[key] = app
+		AppDefs.Apps[key] = app
 
 	}
 
