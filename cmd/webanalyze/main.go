@@ -27,7 +27,7 @@ var (
 
 func init() {
 	flag.StringVar(&host, "host", "", "single host to test")
-	flag.StringVar(&hosts, "hosts", "hosts", "list of hosts to test, one host per line.")
+	flag.StringVar(&hosts, "hosts", "", "list of hosts to test, one host per line.")
 	flag.IntVar(&workers, "worker", 4, "number of worker")
 	flag.BoolVar(&update, "update", false, "update apps file")
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
