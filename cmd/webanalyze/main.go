@@ -10,7 +10,8 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"webanalyze"
+
+	"github.com/rverton/webanalyze"
 )
 
 var host = flag.String("host", "", "single host to test")
