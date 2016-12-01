@@ -9,10 +9,12 @@ import (
 	"strings"
 )
 
-const WAPPALYZER_URL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/apps.json"
+const wappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/apps.json"
 
+// StringArray type is a wrapper for []string for use in unmarshalling the apps.json
 type StringArray []string
 
+// App type encapsulates all the data about an App from apps.json
 type App struct {
 	Cats    []int             `json:"cats"`
 	Headers map[string]string `json:"headers"`
@@ -29,23 +31,26 @@ type App struct {
 	MetaRegex   []NamedRegexp    `json:"-"`
 }
 
+// AppsDefinition type encapsulates the json encoding of the whole apps.json file
 type AppsDefinition struct {
 	Apps map[string]App `json:"apps"`
 	Cats map[int]string `json:"categories"`
 }
 
+// Match type encapsulates the App information from a match on a document
 type Match struct {
 	AppName string `json:"app_name"`
 	App
 	Matches [][]string `json:"matches"`
 }
 
+// NamedRegexp type encapsulates the json encoding for Wappalyzer Header and Meta regexes
 type NamedRegexp struct {
 	Name  string
 	Regex *regexp.Regexp
 }
 
-// custom unmarshaler for handling bogus apps.json types from wappalyzer
+// UnmarshalJSON is a custom unmarshaler for handling bogus apps.json types from wappalyzer
 func (t *StringArray) UnmarshalJSON(data []byte) error {
 	var s string
 	var sa []string
@@ -64,11 +69,11 @@ func (t *StringArray) UnmarshalJSON(data []byte) error {
 }
 
 func updateApps(url string) error {
-	return DownloadFile(url, WAPPALYZER_URL)
+	return DownloadFile(url, wappalyzerURL)
 }
 
+// DownloadFile pulls the latest apps.json file from the Wappalyzer github repo
 func DownloadFile(from, to string) error {
-
 	resp, err := http.Get(from)
 	if err != nil {
 		return err

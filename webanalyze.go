@@ -7,9 +7,13 @@ import (
 	"time"
 )
 
-var wg sync.WaitGroup
-var AppDefs *AppsDefinition
+var (
+	wg sync.WaitGroup
+	// AppDefs provides access to the unmarshalled apps.json file
+	AppDefs *AppsDefinition
+)
 
+// Result type encapsulates the result information from a given host
 type Result struct {
 	Host     string        `json:"host"`
 	Matches  []Match       `json:"matches"`
@@ -17,6 +21,7 @@ type Result struct {
 	Error    error         `json:"error"`
 }
 
+// Init sets up all the workders, reads in the host data and returns the results channel or an error
 func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
 	results := make(chan Result)
 	c := make(chan string)
