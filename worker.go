@@ -72,9 +72,9 @@ func process(host string) ([]Match, error) {
 	for appname, app := range AppDefs.Apps {
 
 		findings := Match{
-			AppName:    appname,
-			AppWebsite: app.Website,
-			Matches:    make([][]string, 0),
+			App:     app,
+			AppName: appname,
+			Matches: make([][]string, 0),
 		}
 
 		// check raw html

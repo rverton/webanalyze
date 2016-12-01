@@ -31,12 +31,13 @@ type App struct {
 
 type AppsDefinition struct {
 	Apps map[string]App `json:"apps"`
+	Cats map[int]string `json:"categories"`
 }
 
 type Match struct {
-	AppName    string     `json:"app"`
-	AppWebsite string     `json:"app_website"`
-	Matches    [][]string `json:"matches"`
+	AppName string `json:"app_name"`
+	App
+	Matches [][]string `json:"matches"`
 }
 
 type NamedRegexp struct {
