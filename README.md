@@ -13,6 +13,8 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
       -hosts="filename": List of hosts. One line per url.
       -update=false: Update apps file
       -worker=4: Number of worker.
+      -json=false: output as JSON
+      -csv-false: output as CSV
 
 The -update flags downloads a current version of apps.json from the wappalyzer repository in the current folder.
 
