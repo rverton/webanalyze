@@ -16,18 +16,18 @@ import (
 )
 
 var (
-	update  bool
-	useCSV  bool
-	useJSON bool
-	workers int
-	apps    string
-	host    string
-	hosts   string
+	update   bool
+	csvFile  string
+	jsonFile string
+	workers  int
+	apps     string
+	host     string
+	hosts    string
 )
 
 func init() {
-	flag.BoolVar(&useCSV, "csv", false, "output as csv")
-	flag.BoolVar(&useJSON, "json", false, "output as json")
+	flag.StringVar(&csvFile, "csv", "", "export to csv file")
+	flag.StringVar(&jsonFile, "json", "", "output to json file")
 	flag.BoolVar(&update, "update", false, "update apps file")
 	flag.IntVar(&workers, "worker", 4, "number of worker")
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
@@ -81,28 +81,43 @@ func main() {
 	log.Printf("Scanning with %v workers.", workers)
 
 	var (
-		res       []webanalyze.Result
-		out       *os.File
-		outWriter *csv.Writer
+		res        []webanalyze.Result
+		out        *os.File
+		outWriter  *csv.Writer
+		outputMode string
 	)
 
-	if useCSV {
-		out, err = os.Create("webanalyze-output.csv")
-		if err != nil {
-			log.Println("error creating file:", err)
-			return
-		}
-		defer out.Close()
-
+	if csvFile != "" {
+		outputMode = "csv"
+		out, err = os.Create(csvFile)
 		outWriter = csv.NewWriter(out)
+		outWriter.Write([]string{"Host", "Category", "App"})
+
 		defer outWriter.Flush()
 
-		outWriter.Write([]string{"Host", "Category", "App"})
+	} else if jsonFile != "" {
+		outputMode = "json"
+		out, err = os.Create(jsonFile)
+		out.Write([]byte("["))
+
+		defer func() {
+			out.Seek(-1, os.SEEK_END)
+			out.Write([]byte("]"))
+		}()
+	} else {
+		outputMode = "stdout"
+	}
+
+	if err != nil {
+		log.Println("error creating export file:", err)
+		return
 	}
 
 	for result := range results {
 		res = append(res, result)
-		if !useJSON {
+
+		switch outputMode {
+		case "stdout":
 			log.Printf("[+] %v (%v):\n", result.Host, result.Duration)
 			for _, a := range result.Matches {
 				log.Printf("\t- %v\t - %v\n", a.AppName, a.App.Cats)
@@ -110,9 +125,8 @@ func main() {
 			if len(result.Matches) <= 0 {
 				log.Printf("\t<no results>\n")
 			}
-		}
 
-		if useCSV {
+		case "csv":
 			for _, m := range result.Matches {
 				for _, c := range m.Cats {
 					var catName string
@@ -130,11 +144,14 @@ func main() {
 				}
 			}
 			outWriter.Flush()
-		}
-	}
+		case "json":
+			b, err := json.Marshal(res)
+			if err != nil {
+				log.Printf("error marshaling content: %v\n", err)
+			}
 
-	if useJSON {
-		b, _ := json.Marshal(res)
-		fmt.Println(string(b))
+			out.Write(b)
+			out.Write([]byte(","))
+		}
 	}
 }

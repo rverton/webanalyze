@@ -8,15 +8,22 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
     $ webanalyze -update
     $ webanalyze -h
     Usage of ./webanalyze:
-      -apps="apps.json": app definition file.
-      -host="": Single host to test
-      -hosts="filename": List of hosts. One line per url.
-      -update=false: Update apps file
-      -worker=4: Number of worker.
-      -json=false: output as JSON
-      -csv-false: output as CSV
+      -apps string
+            app definition file. (default "apps.json")
+      -csv string
+            export to csv file
+      -host string
+            single host to test
+      -hosts string
+            list of hosts to test, one host per line.
+      -json string
+            output to json file
+      -update
+            update apps file
+      -worker int
+            number of worker (default 4)
 
-The -update flags downloads a current version of apps.json from the wappalyzer repository in the current folder.
+The `-update` flags downloads a current version of apps.json from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
 
 ## Display
 
