@@ -25,7 +25,7 @@ type Result struct {
 
 // Init sets up all the workders, reads in the host data and returns the results channel or an error
 func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
-  wa, err := NewWebanalyzer(workers, appsFile)
+  wa, err := NewWebAnalyzer(workers, appsFile)
   if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ type WebAnalyzer struct {
 
 // NewWebanalyzer returns an analyzer struct for an ongoing job, which may be
 // "fed" jobs via a method and returns them via a channel when complete.
-func NewWebanalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
+func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
 	wa := new(WebAnalyzer)
 	wa.Results = make(chan Result)
 	wa.jobs = make(chan *Job)
