@@ -20,11 +20,10 @@ type Result struct {
 	Error    error         `json:"error"`
 }
 
-
 // Init sets up all the workders, reads in the host data and returns the results channel or an error
 func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
-  wa, err := NewWebAnalyzer(workers, appsFile)
-  if err != nil {
+	wa, err := NewWebAnalyzer(workers, appsFile)
+	if err != nil {
 		return nil, err
 	}
 	// send hosts line by line to worker channel
@@ -42,8 +41,8 @@ func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
 
 type WebAnalyzer struct {
 	Results chan Result
-	jobs chan *Job
-	wg *sync.WaitGroup
+	jobs    chan *Job
+	wg      *sync.WaitGroup
 }
 
 // NewWebanalyzer returns an analyzer struct for an ongoing job, which may be
@@ -62,7 +61,7 @@ func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
 }
 
 func (wa *WebAnalyzer) Schedule(job *Job) {
-  wa.jobs <- job
+	wa.jobs <- job
 }
 
 func (wa *WebAnalyzer) Close() {

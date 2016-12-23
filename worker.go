@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	"time"
 	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -67,7 +67,7 @@ func fetchHost(host string) ([]byte, *http.Header, error) {
 func process(job *Job) ([]Match, error) {
 	var apps = make([]Match, 0)
 
-  if (job.Body == nil || len(job.Body) == 0) && !job.forceNotDownload {
+	if (job.Body == nil || len(job.Body) == 0) && !job.forceNotDownload {
 		_body, headers, err := fetchHost(job.URL)
 		if err != nil {
 			return nil, err

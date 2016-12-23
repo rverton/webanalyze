@@ -1,7 +1,7 @@
 package webanalyze
 
 import (
-  "net/http"
+	"net/http"
 )
 
 // Job may consist only of a URL, in which case webanalyse will
@@ -13,10 +13,10 @@ import (
 // then a flag will be set to prevent downloading regardless
 // of the contents (or absence) of the Body or Headers fields.
 type Job struct {
-  URL string
-  Body []byte
-  Headers http.Header //map[string][]string
-  forceNotDownload bool
+	URL              string
+	Body             []byte
+	Headers          http.Header //map[string][]string
+	forceNotDownload bool
 }
 
 // NewOfflineJob constructs a job out of the constituents of a
@@ -25,12 +25,12 @@ type Job struct {
 // fetching from the URL even if the body and headers are nil
 // or empty. Use this for...offline jobs.
 func NewOfflineJob(url, body string, headers map[string][]string) *Job {
-  return &Job{
-    URL: url,
-    Body: []byte(body),
-    Headers: headers,
-    forceNotDownload: true,
-  }
+	return &Job{
+		URL:              url,
+		Body:             []byte(body),
+		Headers:          headers,
+		forceNotDownload: true,
+	}
 }
 
 // NewOnlineJob constructs a job that may either have a URL only,
@@ -38,10 +38,10 @@ func NewOfflineJob(url, body string, headers map[string][]string) *Job {
 // then webanalyzer will not re-download the data, but if a Body is
 // absent then downloading will be attempted.
 func NewOnlineJob(url, body string, headers map[string][]string) *Job {
-  return &Job{
-    URL: url,
-    Body: []byte(body),
-    Headers: headers,
-    forceNotDownload: false,
-  }
+	return &Job{
+		URL:              url,
+		Body:             []byte(body),
+		Headers:          headers,
+		forceNotDownload: false,
+	}
 }
