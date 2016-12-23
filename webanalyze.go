@@ -8,8 +8,6 @@ import (
 )
 
 var (
-	// Global state bad
-	//wg sync.WaitGroup
 	// AppDefs provides access to the unmarshalled apps.json file
 	AppDefs *AppsDefinition
 )

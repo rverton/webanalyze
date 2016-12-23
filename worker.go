@@ -97,22 +97,8 @@ func process(job *Job) ([]Match, error) {
 		}
 
 		// check response header
-		for _, hre := range app.HeaderRegex {
-			// Changed this to check all header values for a header key, not just first.
-			if job.Headers.Get(hre.Name) == "" {
-				continue
-			}
-			hk := http.CanonicalHeaderKey(hre.Name)
-			for _, headerValue := range job.Headers[hk] {
-				//headerValue := job.Headers.Get(h.Name)
-				if headerValue == "" {
-					continue
-				}
-				if m := findMatches(headerValue, []*regexp.Regexp{hre.Regex}); len(m) > 0 {
-					findings.Matches = append(findings.Matches, m...)
-				}
-			}
-		}
+		headerFindings := app.FindInHeaders(job.Headers)
+		findings.Matches = append(findings.Matches, headerFindings...)
 
 		// check url
 		if m := findMatches(job.URL, app.URLRegex); len(m) > 0 {
