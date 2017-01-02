@@ -8,7 +8,6 @@ import (
 )
 
 var (
-	wg sync.WaitGroup
 	// AppDefs provides access to the unmarshalled apps.json file
 	AppDefs *AppsDefinition
 )
@@ -23,28 +22,50 @@ type Result struct {
 
 // Init sets up all the workders, reads in the host data and returns the results channel or an error
 func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
-	results := make(chan Result)
-	c := make(chan string)
-
-	if err := loadApps(appsFile); err != nil {
-		return results, err
+	wa, err := NewWebAnalyzer(workers, appsFile)
+	if err != nil {
+		return nil, err
 	}
-
-	// start worker
-	initWorker(workers, c, results)
-
 	// send hosts line by line to worker channel
-	go func() {
+	go func(hosts io.Reader, wa *WebAnalyzer) {
 		scanner := bufio.NewScanner(hosts)
 		for scanner.Scan() {
-			c <- scanner.Text()
+			url := scanner.Text()
+			wa.Schedule(NewOnlineJob(url, "", nil))
 		}
-		close(c)
-
 		// wait for workers to finish, the close result channel to signal finish of scan
-		wg.Wait()
-		close(results)
-	}()
+		wa.Close()
+	}(hosts, wa)
+	return wa.Results, nil
+}
 
-	return results, nil
+type WebAnalyzer struct {
+	Results chan Result
+	jobs    chan *Job
+	wg      *sync.WaitGroup
+}
+
+// NewWebanalyzer returns an analyzer struct for an ongoing job, which may be
+// "fed" jobs via a method and returns them via a channel when complete.
+func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
+	wa := new(WebAnalyzer)
+	wa.Results = make(chan Result)
+	wa.jobs = make(chan *Job)
+	wa.wg = new(sync.WaitGroup)
+	if err := loadApps(appsFile); err != nil {
+		return nil, err
+	}
+	// start workers
+	initWorker(workers, wa.jobs, wa.Results, wa.wg)
+	return wa, nil
+}
+
+func (wa *WebAnalyzer) Schedule(job *Job) {
+	wa.jobs <- job
+}
+
+func (wa *WebAnalyzer) Close() {
+	close(wa.jobs)
+	wa.wg.Wait()
+	close(wa.Results)
 }

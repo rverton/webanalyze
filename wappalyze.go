@@ -32,6 +32,25 @@ type App struct {
 	MetaRegex   []NamedRegexp    `json:"-"`
 }
 
+func (app *App) FindInHeaders(headers http.Header) (matches [][]string) {
+	for _, hre := range app.HeaderRegex {
+		// Changed this to check all header values for a header key, not just first.
+		if headers.Get(hre.Name) == "" {
+			continue
+		}
+		hk := http.CanonicalHeaderKey(hre.Name)
+		for _, headerValue := range headers[hk] {
+			if headerValue == "" {
+				continue
+			}
+			if m := findMatches(headerValue, []*regexp.Regexp{hre.Regex}); len(m) > 0 {
+				matches = append(matches, m...)
+			}
+		}
+	}
+	return matches
+}
+
 // AppsDefinition type encapsulates the json encoding of the whole apps.json file
 type AppsDefinition struct {
 	Apps map[string]App `json:"apps"`

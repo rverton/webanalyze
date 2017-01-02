@@ -8,68 +8,82 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 // start n worker and let them listen on c for hosts to scan
-func initWorker(count int, c chan string, results chan Result) {
+func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup) {
 	// start workers based on flag
 	for i := 0; i < count; i++ {
 		wg.Add(1)
-		go worker(i, c, results)
+		go worker(c, results, wg)
 	}
 }
 
 // worker loops until channel is closed. processes a single host at once
-func worker(i int, c chan string, results chan Result) {
-
-	for host := range c {
-
-		if !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://") {
-			host = fmt.Sprintf("http://%s", host)
+func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
+	for job := range c {
+		if !strings.HasPrefix(job.URL, "http://") && !strings.HasPrefix(job.URL, "https://") {
+			job.URL = fmt.Sprintf("http://%s", job.URL)
 		}
 
 		t0 := time.Now()
-		result, err := process(host)
+		result, err := process(job)
 		t1 := time.Now()
 
 		res := Result{
-			Host:     host,
+			Host:     job.URL,
 			Matches:  result,
 			Duration: t1.Sub(t0),
 			Error:    err,
 		}
-
 		results <- res
-
 	}
-
 	wg.Done()
 }
 
-// do http request and analyze response
-func process(host string) ([]Match, error) {
-	var apps = make([]Match, 0)
-
-	tr := &http.Transport{
+func fetchHost(host string) ([]byte, *http.Header, error) {
+	// TODO: Reuse client?
+	client := &http.Client{Transport: &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client := &http.Client{Transport: tr}
-
+	}}
 	resp, err := client.Get(host)
 	if err != nil {
-		return apps, err
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// ignore error, body/document not always needed
+		return nil, &resp.Header, nil
+	}
+	return body, &resp.Header, nil
+}
 
-	// ignore error, body/document not always needed
-	body, _ := ioutil.ReadAll(resp.Body)
-	doc, _ := goquery.NewDocumentFromReader(bytes.NewReader(body))
+// do http request and analyze response
+func process(job *Job) ([]Match, error) {
+	var apps = make([]Match, 0)
+
+	if (job.Body == nil || len(job.Body) == 0) && !job.forceNotDownload {
+		_body, headers, err := fetchHost(job.URL)
+		if err != nil {
+			return nil, err
+		}
+		job.Body = _body
+		job.Headers = *headers
+	}
+
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(job.Body))
+	if err != nil {
+		return nil, err
+	}
 
 	for appname, app := range AppDefs.Apps {
+		// TODO: Reduce complexity in this for-loop by functionalising out
+		// the sub-loops and checks.
 
 		findings := Match{
 			App:     app,
@@ -78,60 +92,42 @@ func process(host string) ([]Match, error) {
 		}
 
 		// check raw html
-		if m := findMatches(string(body), app.HTMLRegex); len(m) > 0 {
+		if m := findMatches(string(job.Body), app.HTMLRegex); len(m) > 0 {
 			findings.Matches = append(findings.Matches, m...)
 		}
 
 		// check response header
-		for _, h := range app.HeaderRegex {
-			headerValue := resp.Header.Get(h.Name)
-
-			if headerValue == "" {
-				continue
-			}
-
-			if m := findMatches(headerValue, []*regexp.Regexp{h.Regex}); len(m) > 0 {
-				findings.Matches = append(findings.Matches, m...)
-			}
-
-		}
+		headerFindings := app.FindInHeaders(job.Headers)
+		findings.Matches = append(findings.Matches, headerFindings...)
 
 		// check url
-		if m := findMatches(resp.Request.URL.String(), app.URLRegex); len(m) > 0 {
+		if m := findMatches(job.URL, app.URLRegex); len(m) > 0 {
 			findings.Matches = append(findings.Matches, m...)
 		}
 
 		// check script tags
 		doc.Find("script").Each(func(i int, s *goquery.Selection) {
-
 			if script, exists := s.Attr("src"); exists {
 				if m := findMatches(script, app.ScriptRegex); len(m) > 0 {
 					findings.Matches = append(findings.Matches, m...)
 				}
 			}
-
 		})
 
 		// check meta tags
 		for _, h := range app.MetaRegex {
-
 			selector := fmt.Sprintf("meta[name='%s']", h.Name)
-
 			doc.Find(selector).Each(func(i int, s *goquery.Selection) {
 				content, _ := s.Attr("content")
-
 				if m := findMatches(content, []*regexp.Regexp{h.Regex}); len(m) > 0 {
 					findings.Matches = append(findings.Matches, m...)
 				}
-
 			})
-
 		}
 
 		if len(findings.Matches) > 0 {
 			apps = append(apps, findings)
 		}
-
 	}
 
 	return apps, nil
@@ -145,8 +141,6 @@ func findMatches(content string, regexes []*regexp.Regexp) [][]string {
 		if matches != nil {
 			m = append(m, matches...)
 		}
-
 	}
-
 	return m
 }

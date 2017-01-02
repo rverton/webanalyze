@@ -65,6 +65,19 @@
 			"icon": "3ware.png",
 			"website": "www.3ware.com"
 		},
+		"AD EBiS": {
+			"cats": [
+				10
+			],
+			"html": [
+				"<!-- EBiS contents tag",
+				"<!--EBiS tag",
+				"<!-- Tag EBiS",
+				"<!-- EBiS common tag"
+			],
+			"icon": "ebis.png",
+			"website": "www.ebis.ne.jp"
+		},
 		"AMPcms": {
 			"cats": [
 				1
@@ -2044,6 +2057,18 @@
 			"script": "cdn\\.e-merchant\\.com",
 			"website": "e-merchant.com"
 		},
+		"EC-CUBE": {
+			"cats": [
+				6
+			],
+			"icon": "ec-cube.png",
+			"implies": "PHP",
+			"script": [
+				"eccube\\.js",
+				"win_op\\.js"
+			],
+			"website": "www.ec-cube.net"
+		},
 		"ELOG": {
 			"cats": [
 				19
@@ -2876,6 +2901,23 @@
 			"icon": "Gravatar.png",
 			"website": "gravatar.com"
 		},
+		"Gravity Forms": {
+			"cats": [
+				19
+			],
+			"html": [
+				"<div class=(?:\"|')[^>]*gform_wrapper",
+				"<div class=(?:\"|')[^>]*gform_body",
+				"<ul [^>]*class=(?:\"|')[^>]*gform_fields",
+				"<link [^>]*href=(?:\"|')[^>]*wp-content/plugins/gravityforms/css/"
+			],
+			"icon": "gravityforms.svg",
+			"implies": [
+				"WordPress",
+				"PHP"
+			],
+			"website": "gravityforms.com"
+		},
 		"Gravity Insights": {
 			"cats": [
 				10
@@ -3236,17 +3278,6 @@
 			"script": "^https?://(?:[^/]+\\.)?i(?:oam|v)wbox\\.de/",
 			"website": "infonline.de"
 		},
-		"Infusionsoft": {
-			"cats": [
-				32
-			],
-			"icon": "infusionsoft.svg",
-			"html": [
-				"<input [^>]*name=\"infusionsoft_version\" [^>]*value=\"([^>]*)\" [^>]*\/>\\;version:\\1",
-				"<input [^>]*value=\"([^>]*)\" [^>]*name=\"infusionsoft_version\" [^>]*\/>\\;version:\\1"
-			],
-			"website": "infusionsoft.com"
-		},
 		"IPB": {
 			"cats": [
 				2
@@ -3349,14 +3380,16 @@
 			"icon": "default.png",
 			"website": "indyproject.org"
 		},
-		"Ink": {
+		"Infusionsoft": {
 			"cats": [
-				18
+				32
 			],
-			"html": "<link [^>]*href=\"[^\"]+ink(?:\\.min)?\\.css",
-			"icon": "Ink.png",
-			"script": "ink.*\\.js",
-			"website": "ink.sapo.pt"
+			"html": [
+				"<input [^>]*name=\"infusionsoft_version\" [^>]*value=\"([^>]*)\" [^>]*\\/>\\;version:\\1",
+				"<input [^>]*value=\"([^>]*)\" [^>]*name=\"infusionsoft_version\" [^>]*\\/>\\;version:\\1"
+			],
+			"icon": "infusionsoft.svg",
+			"website": "infusionsoft.com"
 		},
 		"InstantCMS": {
 			"cats": [
@@ -3675,6 +3708,18 @@
 			"icon": "Kampyle.png",
 			"script": "cf\\.kampyle\\.com/k_button\\.js",
 			"website": "www.kampyle.com"
+		},
+		"Kamva": {
+			"cats": [
+				6
+			],
+			"env": "^Kamva$",
+			"icon": "Kamva.svg",
+			"meta": {
+				"generator": "[CK]amva"
+			},
+			"script": "cdn\\.mykamva\\.ir",
+			"website": "kamva.ir"
 		},
 		"Kendo UI": {
 			"cats": [
@@ -4192,22 +4237,24 @@
 			"url": "control/userimage\\.html\\;confidence:70",
 			"website": "mobotix.com"
 		},
-		"MODx": {
+		"MODX": {
 			"cats": [
 				1
 			],
 			"env": "^MODX_MEDIA_PATH$",
 			"headers": {
-				"Set-Cookie": "SN4[a-f\\d]{12}",
-				"X-Powered-By": "^MODx"
+				"Set-Cookie": "SN5[a-f\\d]{12}",
+				"X-Powered-By": "^MODX"
 			},
 			"html": [
-				"<a[^>]+>Powered by MODx</a>",
-				"<(?:link|script)[^>]+assets/snippets/\\;confidence:20"
+				"<a[^>]+>Powered by MODX</a>",
+				"<(?:link|script)[^>]+assets/snippets/\\;confidence:20",
+				"<form[^>]+id=\"ajaxSearch_form\\;confidence:20",
+				"<input[^>]+id=\"ajaxSearch_input\\;confidence:20"
 			],
-			"icon": "MODx.png",
+			"icon": "MODX.png",
 			"implies": "PHP",
-			"website": "modxcms.com"
+			"website": "modx.com"
 		},
 		"MadAdsMedia": {
 			"cats": [
@@ -4241,6 +4288,24 @@
 				"static/frontend\\;confidence:20\\;version:2"
 			],
 			"website": "www.magentocommerce.com"
+		},
+		"Mailchimp": {
+			"cats": [
+				32
+			],
+			"html": [
+				"<form [^>]*data-mailchimp-url",
+				"<form [^>]*id=\"mc-embedded-subscribe-form\"",
+				"<form [^>]*name=\"mc-embedded-subscribe-form\"",
+				"<input [^>]*id=\"mc-email\"\\;confidence:20",
+				"<!-- Begin MailChimp Signup Form -->"
+			],
+			"icon": "mailchimp.svg",
+			"script": [
+				"s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js",
+				"cdn-images.mailchimp.com/[^>]*.css"
+			],
+			"website": "mailchimp.com"
 		},
 		"Mambo": {
 			"cats": [
@@ -6977,11 +7042,7 @@
 		"SumoMe": {
 			"cats": [
 				5,
-				10,
-				32,
-				36,
-				47,
-				51
+				32
 			],
 			"icon": "SumoMe.png",
 			"script": "load\\.sumome\\.com",
@@ -8679,6 +8740,18 @@
 			},
 			"website": "hybris.com/icongo"
 		},
+		"iPresta": {
+			"cats": [
+				6
+			],
+			"excludes": "PrestaShop",
+			"icon": "iPresta.png",
+			"implies": "PHP",
+			"meta": {
+				"designer": "iPresta"
+			},
+			"website": "ipresta.ir"
+		},
 		"iWeb": {
 			"cats": [
 				20
@@ -9381,28 +9454,7 @@
 		"51": "Landing Page Builders",
 		"52": "Live Chat"
 	}
-}
->s+Site is running BIGACE)<span class="pl-pds">&quot;</span></span>,</td>
-      </tr>
-      <tr>
-        <td id="L563" class="blob-num js-line-number" data-line-number="563"></td>
-        <td id="LC563" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>implies<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>PHP<span class="pl-pds">&quot;</span></span>,</td>
-      </tr>
-      <tr>
-        <td id="L564" class="blob-num js-line-number" data-line-number="564"></td>
-        <td id="LC564" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>meta<span class="pl-pds">&quot;</span></span>: {</td>
-      </tr>
-      <tr>
-        <td id="L565" class="blob-num js-line-number" data-line-number="565"></td>
-        <td id="LC565" class="blob-code js-file-line">				<span class="pl-s1"><span class="pl-pds">&quot;</span>generator<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>BIGACE ([<span class="pl-cce">\\</span>d.]+)<span class="pl-cce">\\</span>;version:<span class="pl-cce">\\</span>1<span class="pl-pds">&quot;</span></span></td>
-      </tr>
-      <tr>
-        <td id="L566" class="blob-num js-line-number" data-line-number="566"></td>
-        <td id="LC566" class="blob-code js-file-line">			},</td>
-      </tr>
-      <tr>
-        <td id="L567" class="blob-num js-line-number" data-line-number="567"></td>
-        <td id="LC567" class="blob-code js-file-line">			<span class="pl-s1"><span class="pl-pds">&quot;</span>website<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>bigace.de<span class="pl-pds">&quot;</span></span></td>
+}s="pl-pds">&quot;</span>website<span class="pl-pds">&quot;</span></span>: <span class="pl-s1"><span class="pl-pds">&quot;</span>bigace.de<span class="pl-pds">&quot;</span></span></td>
       </tr>
       <tr>
         <td id="L568" class="blob-num js-line-number" data-line-number="568"></td>
