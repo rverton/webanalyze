@@ -35,13 +35,10 @@ See cmd/webanalyze/main.go for an example.
 
 ## Example
 
-    $ webanalyze -host="http://stackshare.io"
-    2015/05/12 09:27:12 Loaded 752 app definitions
-    2015/05/12 09:27:12 Scanning with 4 workers.
-    [+] http://stackshare.io (1.722697135s):
-        - Glyphicons
-        - Google Font API
-        - RequireJS
-        - Font Awesome
-        - Prototype
-        - jQuery
+    $ webanalyze -host stackshare.io
+    2017/04/19 16:21:18 Scanning with 4 workers.
+    2017/04/19 16:21:19 [+] http://stackshare.io (616.713344ms):
+    2017/04/19 16:21:19 	- Ruby on Rails (Web Frameworks)
+    2017/04/19 16:21:19 	- Google Font API (Font Scripts)
+    2017/04/19 16:21:19 	- Express (Web Frameworks, Web Servers)
+    2017/04/19 16:21:19 	- Nginx (Web Servers)

@@ -33,6 +33,7 @@ func init() {
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "list of hosts to test, one host per line.")
+
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
 	} else {
@@ -120,7 +121,14 @@ func main() {
 		case "stdout":
 			log.Printf("[+] %v (%v):\n", result.Host, result.Duration)
 			for _, a := range result.Matches {
-				log.Printf("\t- %v\t - %v\n", a.AppName, a.App.Cats)
+
+				var categories []string
+
+				for _, cid := range a.App.Cats {
+					categories = append(categories, webanalyze.AppDefs.Cats[cid].Name)
+				}
+
+				log.Printf("\t- %v (%v)\n", a.AppName, strings.Join(categories, ", "))
 			}
 			if len(result.Matches) <= 0 {
 				log.Printf("\t<no results>\n")
