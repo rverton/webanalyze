@@ -130,9 +130,8 @@ func main() {
 			for _, m := range result.Matches {
 				for _, c := range m.Cats {
 					var catName string
-					var ok bool
-					if catName, ok = webanalyze.AppDefs.Cats[c]; !ok {
-						catName = fmt.Sprintf("%d", c)
+					if category, ok := webanalyze.AppDefs.Cats[c]; !ok {
+						catName = fmt.Sprintf("%d", category.Name)
 					}
 					outWriter.Write(
 						[]string{
