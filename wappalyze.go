@@ -17,7 +17,7 @@ type StringArray []string
 
 // App type encapsulates all the data about an App from apps.json
 type App struct {
-	Cats    []int             `json:"cats"`
+	Cats    []string          `json:"cats"`
 	Headers map[string]string `json:"headers"`
 	Meta    map[string]string `json:"meta"`
 	HTML    StringArray       `json:"html"`
@@ -30,6 +30,29 @@ type App struct {
 	URLRegex    []*regexp.Regexp `json:"-"`
 	HeaderRegex []NamedRegexp    `json:"-"`
 	MetaRegex   []NamedRegexp    `json:"-"`
+}
+
+type Category struct {
+	Name string `json:"name"`
+}
+
+// AppsDefinition type encapsulates the json encoding of the whole apps.json file
+type AppsDefinition struct {
+	Apps map[string]App      `json:"apps"`
+	Cats map[string]Category `json:"categories"`
+}
+
+// Match type encapsulates the App information from a match on a document
+type Match struct {
+	App
+	AppName string     `json:"app_name"`
+	Matches [][]string `json:"matches"`
+}
+
+// NamedRegexp type encapsulates the json encoding for Wappalyzer Header and Meta regexes
+type NamedRegexp struct {
+	Name  string
+	Regex *regexp.Regexp
 }
 
 func (app *App) FindInHeaders(headers http.Header) (matches [][]string) {
@@ -51,25 +74,6 @@ func (app *App) FindInHeaders(headers http.Header) (matches [][]string) {
 	return matches
 }
 
-// AppsDefinition type encapsulates the json encoding of the whole apps.json file
-type AppsDefinition struct {
-	Apps map[string]App `json:"apps"`
-	Cats map[int]string `json:"categories"`
-}
-
-// Match type encapsulates the App information from a match on a document
-type Match struct {
-	AppName string `json:"app_name"`
-	App
-	Matches [][]string `json:"matches"`
-}
-
-// NamedRegexp type encapsulates the json encoding for Wappalyzer Header and Meta regexes
-type NamedRegexp struct {
-	Name  string
-	Regex *regexp.Regexp
-}
-
 // UnmarshalJSON is a custom unmarshaler for handling bogus apps.json types from wappalyzer
 func (t *StringArray) UnmarshalJSON(data []byte) error {
 	var s string
@@ -88,10 +92,6 @@ func (t *StringArray) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func updateApps(url string) error {
-	return DownloadFile(url, WappalyzerURL)
-}
-
 // DownloadFile pulls the latest apps.json file from the Wappalyzer github
 func DownloadFile(from, to string) error {
 	resp, err := http.Get(from)
@@ -100,7 +100,7 @@ func DownloadFile(from, to string) error {
 	}
 	defer resp.Body.Close()
 
-	f, err := os.OpenFile(to, os.O_RDWR|os.O_CREATE, 0600)
+	f, err := os.Create(to)
 	if err != nil {
 		return err
 	}
@@ -176,6 +176,7 @@ func loadApps(filename string) error {
 
 	return nil
 }
+
 func compileRegexes(s StringArray) []*regexp.Regexp {
 	var list []*regexp.Regexp
 
