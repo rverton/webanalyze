@@ -14,6 +14,8 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+var timeout = time.Duration(5 * time.Second)
+
 // start n worker and let them listen on c for hosts to scan
 func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup) {
 	// start workers based on flag
@@ -47,9 +49,11 @@ func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
 
 func fetchHost(host string) ([]byte, *http.Header, error) {
 	// TODO: Reuse client?
-	client := &http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}}
+	client := &http.Client{
+		Timeout: timeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}}
 	resp, err := client.Get(host)
 	if err != nil {
 		return nil, nil, err
