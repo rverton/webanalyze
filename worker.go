@@ -13,7 +13,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var timeout = time.Duration(5 * time.Second)
+var Timeout = time.Duration(8 * time.Second)
 
 // start n worker and let them listen on c for hosts to scan
 func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup) {
@@ -48,7 +48,7 @@ func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
 
 func fetchHost(host string) ([]byte, *http.Header, error) {
 	client := &http.Client{
-		Timeout: timeout,
+		Timeout: Timeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}}
