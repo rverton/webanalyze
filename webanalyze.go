@@ -20,6 +20,20 @@ type Result struct {
 	Error    error         `json:"error"`
 }
 
+// Match type encapsulates the App information from a match on a document
+type Match struct {
+	App
+	AppName string     `json:"app_name"`
+	Matches [][]string `json:"matches"`
+	Version string     `json:"version"`
+}
+
+func (m *Match) updateVersion(version string) {
+	if version != "" {
+		m.Version = version
+	}
+}
+
 // Init sets up all the workders, reads in the host data and returns the results channel or an error
 func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
 	wa, err := NewWebAnalyzer(workers, appsFile)

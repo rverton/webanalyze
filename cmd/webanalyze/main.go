@@ -92,7 +92,7 @@ func main() {
 		outputMode = "csv"
 		out, err = os.Create(csvFile)
 		outWriter = csv.NewWriter(out)
-		outWriter.Write([]string{"Host", "Category", "App"})
+		outWriter.Write([]string{"Host", "Category", "App", "Version"})
 
 		defer outWriter.Flush()
 
@@ -128,7 +128,7 @@ func main() {
 					categories = append(categories, webanalyze.AppDefs.Cats[cid].Name)
 				}
 
-				log.Printf("\t- %v (%v)\n", a.AppName, strings.Join(categories, ", "))
+				log.Printf("\t- %v, %v (%v)\n", a.AppName, a.Version, strings.Join(categories, ", "))
 			}
 			if len(result.Matches) <= 0 {
 				log.Printf("\t<no results>\n")
@@ -146,6 +146,7 @@ func main() {
 							result.Host,
 							catName,
 							m.AppName,
+							m.Version,
 						},
 					)
 				}

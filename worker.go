@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -48,7 +47,6 @@ func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
 }
 
 func fetchHost(host string) ([]byte, *http.Header, error) {
-	// TODO: Reuse client?
 	client := &http.Client{
 		Timeout: timeout,
 		Transport: &http.Transport{
@@ -59,6 +57,7 @@ func fetchHost(host string) ([]byte, *http.Header, error) {
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
+
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		// ignore error, body/document not always needed
@@ -96,24 +95,28 @@ func process(job *Job) ([]Match, error) {
 		}
 
 		// check raw html
-		if m := findMatches(string(job.Body), app.HTMLRegex); len(m) > 0 {
+		if m, v := findMatches(string(job.Body), app.HTMLRegex); len(m) > 0 {
 			findings.Matches = append(findings.Matches, m...)
+			findings.updateVersion(v)
 		}
 
 		// check response header
-		headerFindings := app.FindInHeaders(job.Headers)
+		headerFindings, version := app.FindInHeaders(job.Headers)
 		findings.Matches = append(findings.Matches, headerFindings...)
+		findings.updateVersion(version)
 
 		// check url
-		if m := findMatches(job.URL, app.URLRegex); len(m) > 0 {
+		if m, v := findMatches(job.URL, app.URLRegex); len(m) > 0 {
 			findings.Matches = append(findings.Matches, m...)
+			findings.updateVersion(v)
 		}
 
 		// check script tags
 		doc.Find("script").Each(func(i int, s *goquery.Selection) {
 			if script, exists := s.Attr("src"); exists {
-				if m := findMatches(script, app.ScriptRegex); len(m) > 0 {
+				if m, v := findMatches(script, app.ScriptRegex); len(m) > 0 {
 					findings.Matches = append(findings.Matches, m...)
+					findings.updateVersion(v)
 				}
 			}
 		})
@@ -123,8 +126,9 @@ func process(job *Job) ([]Match, error) {
 			selector := fmt.Sprintf("meta[name='%s']", h.Name)
 			doc.Find(selector).Each(func(i int, s *goquery.Selection) {
 				content, _ := s.Attr("content")
-				if m := findMatches(content, []*regexp.Regexp{h.Regex}); len(m) > 0 {
+				if m, v := findMatches(content, []AppRegexp{h}); len(m) > 0 {
 					findings.Matches = append(findings.Matches, m...)
+					findings.updateVersion(v)
 				}
 			})
 		}
@@ -138,13 +142,50 @@ func process(job *Job) ([]Match, error) {
 }
 
 // runs a list of regexes on content
-func findMatches(content string, regexes []*regexp.Regexp) [][]string {
+func findMatches(content string, regexes []AppRegexp) ([][]string, string) {
 	var m [][]string
+	var version string
+
 	for _, r := range regexes {
-		matches := r.FindAllStringSubmatch(content, -1)
-		if matches != nil {
-			m = append(m, matches...)
+		matches := r.Regexp.FindAllStringSubmatch(content, -1)
+		if matches == nil {
+			continue
 		}
+
+		m = append(m, matches...)
+
+		if r.Version != "" {
+			version = findVersion(m, r.Version)
+		}
+
 	}
-	return m
+	return m, version
+}
+
+// parses a version against matches
+func findVersion(matches [][]string, version string) string {
+	/*
+		log.Printf("Matches: %v", matches)
+		log.Printf("Version: %v", version)
+	*/
+
+	var v string
+
+	for _, matchPair := range matches {
+		// replace backtraces (max: 3)
+		for i := 1; i <= 3; i++ {
+			bt := fmt.Sprintf("\\%v", i)
+			if strings.Contains(version, bt) && len(matchPair) >= i {
+				v = strings.Replace(version, bt, matchPair[i], 1)
+			}
+		}
+
+		// return first found version
+		if v != "" {
+			return v
+		}
+
+	}
+
+	return ""
 }
