@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,18 +15,16 @@ import (
 )
 
 var (
-	update   bool
-	csvFile  string
-	jsonFile string
-	workers  int
-	apps     string
-	host     string
-	hosts    string
+	update       bool
+	outputMethod string
+	workers      int
+	apps         string
+	host         string
+	hosts        string
 )
 
 func init() {
-	flag.StringVar(&csvFile, "csv", "", "export to csv file")
-	flag.StringVar(&jsonFile, "json", "", "output to json file")
+	flag.StringVar(&outputMethod, "output", "stdout", "output format (stdout|csv|json)")
 	flag.BoolVar(&update, "update", false, "update apps file")
 	flag.IntVar(&workers, "worker", 4, "number of worker")
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
@@ -82,42 +79,22 @@ func main() {
 	log.Printf("Scanning with %v workers.", workers)
 
 	var (
-		res        []webanalyze.Result
-		out        *os.File
-		outWriter  *csv.Writer
-		outputMode string
+		res       []webanalyze.Result
+		outWriter *csv.Writer
 	)
 
-	if csvFile != "" {
-		outputMode = "csv"
-		out, err = os.Create(csvFile)
-		outWriter = csv.NewWriter(out)
+	if outputMethod == "csv" {
+		outWriter = csv.NewWriter(os.Stdout)
 		outWriter.Write([]string{"Host", "Category", "App", "Version"})
 
 		defer outWriter.Flush()
 
-	} else if jsonFile != "" {
-		outputMode = "json"
-		out, err = os.Create(jsonFile)
-		out.Write([]byte("["))
-
-		defer func() {
-			out.Seek(-1, os.SEEK_END)
-			out.Write([]byte("]"))
-		}()
-	} else {
-		outputMode = "stdout"
-	}
-
-	if err != nil {
-		log.Println("error creating export file:", err)
-		return
 	}
 
 	for result := range results {
 		res = append(res, result)
 
-		switch outputMode {
+		switch outputMethod {
 		case "stdout":
 			log.Printf("[+] %v (%v):\n", result.Host, result.Duration)
 			for _, a := range result.Matches {
@@ -136,30 +113,32 @@ func main() {
 
 		case "csv":
 			for _, m := range result.Matches {
-				for _, c := range m.Cats {
-					var catName string
-					if category, ok := webanalyze.AppDefs.Cats[c]; !ok {
-						catName = fmt.Sprintf("%d", category.Name)
-					}
-					outWriter.Write(
-						[]string{
-							result.Host,
-							catName,
-							m.AppName,
-							m.Version,
-						},
-					)
-				}
+				outWriter.Write(
+					[]string{
+						result.Host,
+						strings.Join(m.CatNames, ","),
+						m.AppName,
+						m.Version,
+					},
+				)
 			}
 			outWriter.Flush()
 		case "json":
-			b, err := json.Marshal(res)
-			if err != nil {
-				log.Printf("error marshaling content: %v\n", err)
+
+			output := struct {
+				Hostname string             `json:"hostname"`
+				Matches  []webanalyze.Match `json:"matches"`
+			}{
+				result.Host,
+				result.Matches,
 			}
 
-			out.Write(b)
-			out.Write([]byte(","))
+			b, err := json.Marshal(output)
+			if err != nil {
+				log.Printf("cannot marshal output: %v\n", err)
+			}
+
+			os.Stdout.Write(b)
 		}
 	}
 }

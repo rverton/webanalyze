@@ -22,7 +22,7 @@ type Result struct {
 
 // Match type encapsulates the App information from a match on a document
 type Match struct {
-	App
+	App     `json:"app"`
 	AppName string     `json:"app_name"`
 	Matches [][]string `json:"matches"`
 	Version string     `json:"version"`

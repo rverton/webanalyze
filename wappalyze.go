@@ -17,13 +17,14 @@ type StringArray []string
 
 // App type encapsulates all the data about an App from apps.json
 type App struct {
-	Cats    []string          `json:"cats"`
-	Headers map[string]string `json:"headers"`
-	Meta    map[string]string `json:"meta"`
-	HTML    StringArray       `json:"html"`
-	Script  StringArray       `json:"script"`
-	URL     StringArray       `json:"url"`
-	Website string            `json:"website"`
+	Cats     []string          `json:"cats"`
+	CatNames []string          `json:"category_names"`
+	Headers  map[string]string `json:"headers"`
+	Meta     map[string]string `json:"meta"`
+	HTML     StringArray       `json:"html"`
+	Script   StringArray       `json:"script"`
+	URL      StringArray       `json:"url"`
+	Website  string            `json:"website"`
 
 	HTMLRegex   []AppRegexp `json:"-"`
 	ScriptRegex []AppRegexp `json:"-"`
@@ -126,6 +127,14 @@ func loadApps(filename string) error {
 
 		app.HeaderRegex = compileNamedRegexes(app.Headers)
 		app.MetaRegex = compileNamedRegexes(app.Meta)
+
+		app.CatNames = make([]string, 0)
+
+		for _, cid := range app.Cats {
+			if category, ok := AppDefs.Cats[cid]; ok && category.Name != "" {
+				app.CatNames = append(app.CatNames, category.Name)
+			}
+		}
 
 		AppDefs.Apps[key] = app
 
