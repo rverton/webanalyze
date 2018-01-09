@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -52,14 +53,21 @@ func fetchHost(host string) ([]byte, *http.Header, error) {
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}}
-	resp, err := client.Get(host)
+
+	req, err  := http.NewRequest("GET", host, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	req.Header.Add("Accept", "*/*")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		// ignore error, body/document not always needed
 		return nil, &resp.Header, nil
 	}
