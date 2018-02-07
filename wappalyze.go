@@ -17,7 +17,7 @@ type StringArray []string
 
 // App type encapsulates all the data about an App from apps.json
 type App struct {
-	Cats     []string          `json:"cats"`
+	Cats     []int             `json:"cats"`
 	CatNames []string          `json:"category_names"`
 	Headers  map[string]string `json:"headers"`
 	Meta     map[string]string `json:"meta"`
@@ -39,8 +39,8 @@ type Category struct {
 
 // AppsDefinition type encapsulates the json encoding of the whole apps.json file
 type AppsDefinition struct {
-	Apps map[string]App      `json:"apps"`
-	Cats map[string]Category `json:"categories"`
+	Apps map[string]App   `json:"apps"`
+	Cats map[int]Category `json:"categories"`
 }
 
 type AppRegexp struct {
