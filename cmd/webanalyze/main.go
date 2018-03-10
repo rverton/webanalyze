@@ -102,7 +102,7 @@ func main() {
 				var categories []string
 
 				for _, cid := range a.App.Cats {
-					categories = append(categories, webanalyze.AppDefs.Cats[cid].Name)
+					categories = append(categories, webanalyze.AppDefs.Cats[string(cid)].Name)
 				}
 
 				log.Printf("\t- %v, %v (%v)\n", a.AppName, a.Version, strings.Join(categories, ", "))

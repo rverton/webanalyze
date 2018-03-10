@@ -2,6 +2,7 @@ package webanalyze
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -17,7 +18,7 @@ type StringArray []string
 
 // App type encapsulates all the data about an App from apps.json
 type App struct {
-	Cats     []int             `json:"cats"`
+	Cats     StringArray       `json:"cats"`
 	CatNames []string          `json:"category_names"`
 	Headers  map[string]string `json:"headers"`
 	Meta     map[string]string `json:"meta"`
@@ -39,8 +40,8 @@ type Category struct {
 
 // AppsDefinition type encapsulates the json encoding of the whole apps.json file
 type AppsDefinition struct {
-	Apps map[string]App   `json:"apps"`
-	Cats map[int]Category `json:"categories"`
+	Apps map[string]App      `json:"apps"`
+	Cats map[string]Category `json:"categories"`
 }
 
 type AppRegexp struct {
@@ -74,15 +75,25 @@ func (app *App) FindInHeaders(headers http.Header) (matches [][]string, version 
 func (t *StringArray) UnmarshalJSON(data []byte) error {
 	var s string
 	var sa []string
+	var na []int
 
 	if err := json.Unmarshal(data, &s); err != nil {
+		if err := json.Unmarshal(data, &na); err == nil {
+			// not a string, so maybe []int?
+			*t = make(StringArray, len(na))
 
-		// not a string, so maybe []string?
-		if err := json.Unmarshal(data, &sa); err != nil {
-			return err
+			for i, number := range na {
+				(*t)[i] = fmt.Sprintf("%d", number)
+			}
+
+			return nil
+		} else if err := json.Unmarshal(data, &sa); err == nil {
+			// not a string, so maybe []string?
+			*t = sa
+			return nil
 		}
-		*t = sa
-		return nil
+		fmt.Println(string(data))
+		return err
 	}
 	*t = StringArray{s}
 	return nil
@@ -131,7 +142,7 @@ func loadApps(filename string) error {
 		app.CatNames = make([]string, 0)
 
 		for _, cid := range app.Cats {
-			if category, ok := AppDefs.Cats[cid]; ok && category.Name != "" {
+			if category, ok := AppDefs.Cats[string(cid)]; ok && category.Name != "" {
 				app.CatNames = append(app.CatNames, category.Name)
 			}
 		}
