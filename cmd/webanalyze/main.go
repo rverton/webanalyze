@@ -29,7 +29,7 @@ func init() {
 	flag.IntVar(&workers, "worker", 4, "number of worker")
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
 	flag.StringVar(&host, "host", "", "single host to test")
-	flag.StringVar(&hosts, "hosts", "", "list of hosts to test, one host per line.")
+	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
 
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
