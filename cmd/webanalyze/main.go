@@ -73,7 +73,7 @@ func main() {
 	results, err := webanalyze.Init(workers, file, apps)
 
 	if err != nil {
-		log.Println("error initializing:", err)
+		log.Fatal("error initializing:", err)
 	}
 
 	log.Printf("Scanning with %v workers.", workers)
