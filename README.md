@@ -5,7 +5,7 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 ## Installation and usage
 
     $ go get -u github.com/rverton/webanalyze/...
-    $ webanalyze -update # loads nem apps.json file from wappalyzer project
+    $ webanalyze -update # loads new apps.json file from wappalyzer project
     $ webanalyze -h
     Usage of webanalyze:
       -apps string
