@@ -5,16 +5,15 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 ## Installation and usage
 
     $ go get -u github.com/rverton/webanalyze/...
-    $ webanalyze -update
+    $ webanalyze -update # loads nem apps.json file from wappalyzer project
     $ webanalyze -h
-    ./webanalyze                                                  git:master*
-    Usage of ./webanalyze:
+    Usage of webanalyze:
       -apps string
             app definition file. (default "apps.json")
       -host string
             single host to test
       -hosts string
-            list of hosts to test, one host per line.
+            filename with hosts, one host per line.
       -output string
             output format (stdout|csv|json) (default "stdout")
       -update
@@ -26,7 +25,7 @@ The `-update` flags downloads a current version of apps.json from the [wappalyze
 
 ## Display
 
-Run cmd/webanalyze/index.html (on sth. like SimpleHTTPServer) to display results in a searchable dashboard.
+Run `cmd/webanalyze/index.html` (on sth. like SimpleHTTPServer) to display results in a searchable dashboard.
 
 ## Development / Usage as a lib
 
