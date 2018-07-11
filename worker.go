@@ -14,7 +14,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var Timeout = time.Duration(8 * time.Second)
+var Timeout = 8 * time.Second
 
 // start n worker and let them listen on c for hosts to scan
 func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup) {
