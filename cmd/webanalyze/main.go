@@ -138,6 +138,7 @@ func main() {
 				log.Printf("cannot marshal output: %v\n", err)
 			}
 
+			b = append(b, '\n')
 			os.Stdout.Write(b)
 		}
 	}
