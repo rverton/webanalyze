@@ -29,22 +29,24 @@ Run `cmd/webanalyze/index.html` (on sth. like SimpleHTTPServer) to display resul
 
 ## Development / Usage as a lib
 
-See cmd/webanalyze/main.go for an example.
+See `cmd/webanalyze/main.go` for an example.
 
 ## Example
 
-    $ webanalyze -host stackshare.io
-    2017/06/19 10:22:23 Scanning with 4 workers.
-    2017/06/19 10:22:24 [+] http://stackshare.io (556.835509ms):
-    2017/06/19 10:22:24 	- Express,  (Web Frameworks, Web Servers)
-    2017/06/19 10:22:24 	- Nginx, 1.8.1 (Web Servers)
-    2017/06/19 10:22:24 	- Ruby on Rails,  (Web Frameworks)
-    2017/06/19 10:22:24 	- Google Font API,  (Font Scripts)
-
-    $ webanalyze -host stackshare.io -output csv
-    2017/06/19 10:22:50 Scanning with 4 workers.
+    $ webanalyze -host https://stackshare.io
+    2019/01/05 23:41:45 Scanning with 4 workers.
+    2019/01/05 23:41:46 [+] https://stackshare.io (1.025640074s):
+    2019/01/05 23:41:46 	- jQuery,  (JavaScript Libraries)
+    2019/01/05 23:41:46 	- Cowboy,  (Web Frameworks, Web Servers)
+    2019/01/05 23:41:46 	- Erlang,  (Programming Languages)
+    2019/01/05 23:41:46 	- Ruby on Rails,  (Web Frameworks)
+    2019/01/05 23:41:46 	- Ruby,  (Programming Languages)
+    
+    $ webanalyze -host https://stackshare.io -output csv
+    2019/01/05 23:45:04 Scanning with 4 workers.
     Host,Category,App,Version
-    http://stackshare.io,"Web Frameworks,Web Servers",Express,
-    http://stackshare.io,Web Servers,Nginx,1.8.1
-    http://stackshare.io,Font Scripts,Google Font API,
-    http://stackshare.io,Web Frameworks,Ruby on Rails,
+    https://stackshare.io,"Web Frameworks,Web Servers",Cowboy,
+    https://stackshare.io,Programming Languages,Erlang,
+    https://stackshare.io,Web Frameworks,Ruby on Rails,
+    https://stackshare.io,Programming Languages,Ruby,
+    https://stackshare.io,JavaScript Libraries,jQuery,
