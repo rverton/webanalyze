@@ -94,6 +94,10 @@ func main() {
 	for result := range results {
 		res = append(res, result)
 
+		if result.Error != nil {
+			log.Printf("[-] Error for %v: %v", result.Host, result.Error)
+		}
+
 		switch outputMethod {
 		case "stdout":
 			log.Printf("[+] %v (%v):\n", result.Host, result.Duration)
