@@ -27,15 +27,17 @@ type App struct {
 	Script   StringArray       `json:"script"`
 	URL      StringArray       `json:"url"`
 	Website  string            `json:"website"`
+	Implies  StringArray       `json:"implies"`
 
 	HTMLRegex   []AppRegexp `json:"-"`
 	ScriptRegex []AppRegexp `json:"-"`
 	URLRegex    []AppRegexp `json:"-"`
 	HeaderRegex []AppRegexp `json:"-"`
 	MetaRegex   []AppRegexp `json:"-"`
+	CookieRegex []AppRegexp `json:"-"`
 }
 
-// App category names defined by wappalyzer
+// Category names defined by wappalyzer
 type Category struct {
 	Name string `json:"name"`
 }
@@ -141,6 +143,7 @@ func loadApps(filename string) error {
 
 		app.HeaderRegex = compileNamedRegexes(app.Headers)
 		app.MetaRegex = compileNamedRegexes(app.Meta)
+		app.CookieRegex = compileNamedRegexes(app.Cookies)
 
 		app.CatNames = make([]string, 0)
 
@@ -162,16 +165,17 @@ func compileNamedRegexes(from map[string]string) []AppRegexp {
 	var list []AppRegexp
 
 	for key, value := range from {
-		if value == "" {
-			continue
-		}
-
-		// Filter out webapplyzer attributes from regular expression
-		splitted := strings.Split(value, "\\;")
 
 		h := AppRegexp{
 			Name: key,
 		}
+
+		if value == "" {
+			value = ".*"
+		}
+
+		// Filter out webapplyzer attributes from regular expression
+		splitted := strings.Split(value, "\\;")
 
 		r, err := regexp.Compile(splitted[0])
 		if err != nil {

@@ -16,6 +16,7 @@ type Job struct {
 	URL              string
 	Body             []byte
 	Headers          http.Header //map[string][]string
+	Cookies          []*http.Cookie
 	forceNotDownload bool
 }
 
