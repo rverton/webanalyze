@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
@@ -14,9 +14,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var Timeout = 8 * time.Second
+var timeout = 8 * time.Second
 
-// start n worker and let them listen on c for hosts to scan
+// start n worker and let them listen on channel c for hosts to scan
 func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup) {
 	// start workers based on flag
 	for i := 0; i < count; i++ {
@@ -49,12 +49,12 @@ func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
 
 func fetchHost(host string) ([]byte, *http.Header, error) {
 	client := &http.Client{
-		Timeout: Timeout,
+		Timeout: timeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}}
 
-	req, err  := http.NewRequest("GET", host, nil)
+	req, err := http.NewRequest("GET", host, nil)
 	if err != nil {
 		return nil, nil, err
 	}

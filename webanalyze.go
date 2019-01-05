@@ -28,6 +28,13 @@ type Match struct {
 	Version string     `json:"version"`
 }
 
+// WebAnalyzer types holds an analyzation job
+type WebAnalyzer struct {
+	Results chan Result
+	jobs    chan *Job
+	wg      *sync.WaitGroup
+}
+
 func (m *Match) updateVersion(version string) {
 	if version != "" {
 		m.Version = version
@@ -45,21 +52,15 @@ func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
 		scanner := bufio.NewScanner(hosts)
 		for scanner.Scan() {
 			url := scanner.Text()
-			wa.Schedule(NewOnlineJob(url, "", nil))
+			wa.schedule(NewOnlineJob(url, "", nil))
 		}
 		// wait for workers to finish, the close result channel to signal finish of scan
-		wa.Close()
+		wa.close()
 	}(hosts, wa)
 	return wa.Results, nil
 }
 
-type WebAnalyzer struct {
-	Results chan Result
-	jobs    chan *Job
-	wg      *sync.WaitGroup
-}
-
-// NewWebanalyzer returns an analyzer struct for an ongoing job, which may be
+// NewWebAnalyzer returns an analyzer struct for an ongoing job, which may be
 // "fed" jobs via a method and returns them via a channel when complete.
 func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
 	wa := new(WebAnalyzer)
@@ -74,11 +75,11 @@ func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
 	return wa, nil
 }
 
-func (wa *WebAnalyzer) Schedule(job *Job) {
+func (wa *WebAnalyzer) schedule(job *Job) {
 	wa.jobs <- job
 }
 
-func (wa *WebAnalyzer) Close() {
+func (wa *WebAnalyzer) close() {
 	close(wa.jobs)
 	wa.wg.Wait()
 	close(wa.Results)

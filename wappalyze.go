@@ -20,6 +20,7 @@ type StringArray []string
 type App struct {
 	Cats     StringArray       `json:"cats"`
 	CatNames []string          `json:"category_names"`
+	Cookies  map[string]string `json:"cookies"`
 	Headers  map[string]string `json:"headers"`
 	Meta     map[string]string `json:"meta"`
 	HTML     StringArray       `json:"html"`
@@ -34,6 +35,7 @@ type App struct {
 	MetaRegex   []AppRegexp `json:"-"`
 }
 
+// App category names defined by wappalyzer
 type Category struct {
 	Name string `json:"name"`
 }
@@ -122,6 +124,7 @@ func loadApps(filename string) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	dec := json.NewDecoder(f)
 	if err = dec.Decode(&AppDefs); err != nil {
