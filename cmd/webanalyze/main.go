@@ -57,6 +57,10 @@ func main() {
 
 		log.Println("app definition file updated from ", webanalyze.WappalyzerURL)
 
+		if host == "" && hosts == "" {
+			return
+		}
+
 	}
 
 	// check single host or hosts file
