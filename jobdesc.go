@@ -17,6 +17,7 @@ type Job struct {
 	Body             []byte
 	Headers          http.Header //map[string][]string
 	Cookies          []*http.Cookie
+	Crawl            int
 	forceNotDownload bool
 }
 
@@ -30,6 +31,7 @@ func NewOfflineJob(url, body string, headers map[string][]string) *Job {
 		URL:              url,
 		Body:             []byte(body),
 		Headers:          headers,
+		Crawl:            0,
 		forceNotDownload: true,
 	}
 }
@@ -38,11 +40,12 @@ func NewOfflineJob(url, body string, headers map[string][]string) *Job {
 // or a URL, Body and Headers. If it contains at least a URL and Body,
 // then webanalyzer will not re-download the data, but if a Body is
 // absent then downloading will be attempted.
-func NewOnlineJob(url, body string, headers map[string][]string) *Job {
+func NewOnlineJob(url, body string, headers map[string][]string, crawlCount int) *Job {
 	return &Job{
 		URL:              url,
 		Body:             []byte(body),
 		Headers:          headers,
+		Crawl:            crawlCount,
 		forceNotDownload: false,
 	}
 }

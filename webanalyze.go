@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -19,6 +20,7 @@ var (
 	// AppDefs provides access to the unmarshalled apps.json file
 	AppDefs *AppsDefinition
 	timeout = 8 * time.Second
+	wa      *WebAnalyzer
 )
 
 // Result type encapsulates the result information from a given host
@@ -39,9 +41,11 @@ type Match struct {
 
 // WebAnalyzer types holds an analyzation job
 type WebAnalyzer struct {
-	Results chan Result
-	jobs    chan *Job
 	wg      *sync.WaitGroup
+	Results chan Result
+
+	wgJobs *sync.WaitGroup
+	jobs   chan *Job
 }
 
 func (m *Match) updateVersion(version string) {
@@ -51,18 +55,30 @@ func (m *Match) updateVersion(version string) {
 }
 
 // Init sets up all the workders, reads in the host data and returns the results channel or an error
-func Init(workers int, hosts io.Reader, appsFile string) (chan Result, error) {
-	wa, err := NewWebAnalyzer(workers, appsFile)
+func Init(workers int, hosts io.Reader, appsFile string, crawlCount int) (chan Result, error) {
+	var err error
+	wa, err = NewWebAnalyzer(workers, appsFile)
 	if err != nil {
 		return nil, err
 	}
+
+	// increment wg for outer root url loop
+	wa.wgJobs.Add(1)
+
 	// send hosts line by line to worker channel
 	go func(hosts io.Reader, wa *WebAnalyzer) {
 		scanner := bufio.NewScanner(hosts)
 		for scanner.Scan() {
 			url := scanner.Text()
-			wa.schedule(NewOnlineJob(url, "", nil))
+			wa.schedule(NewOnlineJob(url, "", nil, crawlCount))
+
+			// increment wg for each to be crawled page
+			if crawlCount > 0 {
+				wa.wgJobs.Add(1)
+			}
 		}
+		wa.wgJobs.Done()
+
 		// wait for workers to finish, the close result channel to signal finish of scan
 		wa.close()
 	}(hosts, wa)
@@ -76,6 +92,7 @@ func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
 	wa.Results = make(chan Result)
 	wa.jobs = make(chan *Job)
 	wa.wg = new(sync.WaitGroup)
+	wa.wgJobs = new(sync.WaitGroup)
 	if err := loadApps(appsFile); err != nil {
 		return nil, err
 	}
@@ -89,7 +106,9 @@ func (wa *WebAnalyzer) schedule(job *Job) {
 }
 
 func (wa *WebAnalyzer) close() {
+	wa.wgJobs.Wait()
 	close(wa.jobs)
+
 	wa.wg.Wait()
 	close(wa.Results)
 }
@@ -106,9 +125,12 @@ func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup)
 // worker loops until channel is closed. processes a single host at once
 func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
 	for job := range c {
-		if !strings.HasPrefix(job.URL, "http://") && !strings.HasPrefix(job.URL, "https://") {
-			job.URL = fmt.Sprintf("http://%s", job.URL)
+
+		u, err := url.Parse(job.URL)
+		if u.Scheme == "" {
+			u.Scheme = "http"
 		}
+		job.URL = u.String()
 
 		t0 := time.Now()
 		result, err := process(job)
@@ -143,6 +165,59 @@ func fetchHost(host string) (*http.Response, error) {
 		return nil, err
 	}
 	return resp, nil
+}
+
+func unique(strSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range strSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
+
+func sameUrl(u1, u2 *url.URL) bool {
+	return u1.Hostname() == u2.Hostname() &&
+		u1.Port() == u2.Port() &&
+		u1.RequestURI() == u2.RequestURI()
+}
+
+func parseLinks(doc *goquery.Document, base *url.URL) []string {
+	var links []string
+
+	doc.Find("a").Each(func(i int, s *goquery.Selection) {
+		val, ok := s.Attr("href")
+		if !ok {
+			return
+		}
+
+		u, err := url.Parse(val)
+		if err != nil {
+			return
+		}
+
+		urlResolved := base.ResolveReference(u)
+
+		if urlResolved.Hostname() != base.Hostname() {
+			return
+		}
+
+		if urlResolved.RequestURI() == "" {
+			urlResolved.Path = "/"
+		}
+
+		if sameUrl(base, urlResolved) {
+			return
+		}
+
+		links = append(links, urlResolved.String())
+
+	})
+
+	return unique(links)
 }
 
 // do http request and analyze response
@@ -182,6 +257,19 @@ func process(job *Job) ([]Match, error) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
 		return nil, err
+	}
+
+	// handle crawling
+	if job.Crawl > 0 {
+		base, _ := url.Parse(job.URL)
+
+		for c, link := range parseLinks(doc, base) {
+			if c >= job.Crawl {
+				break
+			}
+			wa.schedule(NewOnlineJob(link, "", nil, 0))
+		}
+		wa.wgJobs.Done()
 	}
 
 	for appname, app := range AppDefs.Apps {

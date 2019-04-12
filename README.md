@@ -10,6 +10,8 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
     Usage of webanalyze:
       -apps string
             app definition file. (default "apps.json")
+      -crawl int
+            links to follow from the root page (default 0)
       -host string
             single host to test
       -hosts string
@@ -20,6 +22,7 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
             update apps file
       -worker int
             number of worker (default 4)
+
 
 The `-update` flags downloads a current version of apps.json from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
 

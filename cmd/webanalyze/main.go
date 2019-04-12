@@ -21,6 +21,7 @@ var (
 	apps         string
 	host         string
 	hosts        string
+	crawlCount   int
 )
 
 func init() {
@@ -30,6 +31,7 @@ func init() {
 	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
+	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
 
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
@@ -74,7 +76,7 @@ func main() {
 	}
 	defer file.Close()
 
-	results, err := webanalyze.Init(workers, file, apps)
+	results, err := webanalyze.Init(workers, file, apps, crawlCount)
 
 	if err != nil {
 		log.Fatal("error initializing:", err)
