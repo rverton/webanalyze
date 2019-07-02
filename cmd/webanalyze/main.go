@@ -11,17 +11,18 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/rverton/webanalyze"
+	"webanalyze"
 )
 
 var (
-	update       bool
-	outputMethod string
-	workers      int
-	apps         string
-	host         string
-	hosts        string
-	crawlCount   int
+	update          bool
+	outputMethod    string
+	workers         int
+	apps            string
+	host            string
+	hosts           string
+	crawlCount      int
+	searchSubdomain bool
 )
 
 func init() {
@@ -32,6 +33,7 @@ func init() {
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
+	flag.BoolVar(&searchSubdomain, "search", true, "searches all urls with same base domain (i.e. example.com and sub.exmaple.com)")
 
 	if cpu := runtime.NumCPU(); cpu == 1 {
 		runtime.GOMAXPROCS(2)
@@ -76,7 +78,7 @@ func main() {
 	}
 	defer file.Close()
 
-	results, err := webanalyze.Init(workers, file, apps, crawlCount)
+	results, err := webanalyze.Init(workers, file, apps, crawlCount, searchSubdomain)
 
 	if err != nil {
 		log.Fatal("error initializing:", err)
