@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/bobesa/go-domain-util/domainutil"
 )
 
 var (
@@ -55,7 +56,7 @@ func (m *Match) updateVersion(version string) {
 }
 
 // Init sets up all the workders, reads in the host data and returns the results channel or an error
-func Init(workers int, hosts io.Reader, appsFile string, crawlCount int) (chan Result, error) {
+func Init(workers int, hosts io.Reader, appsFile string, crawlCount int, searchSubdomain bool) (chan Result, error) {
 	var err error
 	wa, err = NewWebAnalyzer(workers, appsFile)
 	if err != nil {
@@ -70,7 +71,7 @@ func Init(workers int, hosts io.Reader, appsFile string, crawlCount int) (chan R
 		scanner := bufio.NewScanner(hosts)
 		for scanner.Scan() {
 			url := scanner.Text()
-			wa.schedule(NewOnlineJob(url, "", nil, crawlCount))
+			wa.schedule(NewOnlineJob(url, "", nil, crawlCount, searchSubdomain))
 
 			// increment wg for each to be crawled page
 			if crawlCount > 0 {
@@ -185,7 +186,7 @@ func sameUrl(u1, u2 *url.URL) bool {
 		u1.RequestURI() == u2.RequestURI()
 }
 
-func parseLinks(doc *goquery.Document, base *url.URL) []string {
+func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []string {
 	var links []string
 
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
@@ -201,7 +202,11 @@ func parseLinks(doc *goquery.Document, base *url.URL) []string {
 
 		urlResolved := base.ResolveReference(u)
 
-		if urlResolved.Hostname() != base.Hostname() {
+		if !searchSubdomain && urlResolved.Hostname() != base.Hostname() {
+			return
+		}
+
+		if searchSubdomain && !isSubdomain(base, u) {
 			return
 		}
 
@@ -218,6 +223,10 @@ func parseLinks(doc *goquery.Document, base *url.URL) []string {
 	})
 
 	return unique(links)
+}
+
+func isSubdomain(base, u *url.URL) bool {
+	return domainutil.Domain(base.String()) == domainutil.Domain(u.String())
 }
 
 // do http request and analyze response
@@ -263,11 +272,11 @@ func process(job *Job) ([]Match, error) {
 	if job.Crawl > 0 {
 		base, _ := url.Parse(job.URL)
 
-		for c, link := range parseLinks(doc, base) {
+		for c, link := range parseLinks(doc, base, job.SearchSubdomain) {
 			if c >= job.Crawl {
 				break
 			}
-			wa.schedule(NewOnlineJob(link, "", nil, 0))
+			wa.schedule(NewOnlineJob(link, "", nil, 0, false))
 		}
 		wa.wgJobs.Done()
 	}
