@@ -186,7 +186,7 @@ func sameUrl(u1, u2 *url.URL) bool {
 		u1.RequestURI() == u2.RequestURI()
 }
 
-func parseLinks(doc *goquery.Document, base *url.URL, ss bool) []string {
+func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []string {
 	var links []string
 
 	doc.Find("a").Each(func(i int, s *goquery.Selection) {
@@ -202,11 +202,11 @@ func parseLinks(doc *goquery.Document, base *url.URL, ss bool) []string {
 
 		urlResolved := base.ResolveReference(u)
 
-		if !ss && urlResolved.Hostname() != base.Hostname() {
+		if !searchSubdomain && urlResolved.Hostname() != base.Hostname() {
 			return
 		}
 
-		if ss && !isSubdomain(base, u) {
+		if searchSubdomain && !isSubdomain(base, u) {
 			return
 		}
 
