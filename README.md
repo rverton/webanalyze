@@ -18,6 +18,8 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
             filename with hosts, one host per line.
       -output string
             output format (stdout|csv|json) (default "stdout")
+      -search
+            searches all urls with same base domain (i.e. example.com and sub.example.com) (default true)
       -update
             update apps file
       -worker int
