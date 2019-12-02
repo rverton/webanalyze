@@ -4,6 +4,10 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 
 ## Installation and usage
 
+Precompiled releases can be downloaded directly [here](https://github.com/rverton/webanalyze/releases).
+
+If you want to build for yourself:
+
     $ go get -u github.com/rverton/webanalyze/...
     $ webanalyze -update # loads new apps.json file from wappalyzer project
     $ webanalyze -h
