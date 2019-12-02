@@ -9,7 +9,7 @@ TAG="v${VERSION}"
 USER="rverton"
 REPO="webanalyze"
 REPO_PATH="cmd/webanalyze"
-BINARY="webanalyze"
+BINARY="${REPO}"
 
 if [[ -z "${VERSION}" ]]; then
     echo "Usage: ${0} <version>"
@@ -54,16 +54,16 @@ for ARCH in "amd64" "386"; do
             BINFILE="${BINFILE}.exe"
         fi
 
-        rm -f ${BINFILE}
+        # rm -f ${BINFILE}
 
         GOOS=${OS} GOARCH=${ARCH} go build -o $DISTDIR/$BINFILE -ldflags "-X main.gronVersion=${VERSION}" github.com/${USER}/${REPO}/${REPO_PATH}
 
         if [[ "${OS}" == "windows" ]]; then
-            ARCHIVE="$DISTDIR/${BINARY}-${OS}-${ARCH}-${VERSION}.zip"
-            cd $DISTDIR && zip ${ARCHIVE} $DISTDIR/${BINFILE}
+            ARCHIVE="${BINARY}-${OS}-${ARCH}-${VERSION}.zip"
+            cd $DISTDIR && zip ${ARCHIVE} ${BINFILE}
         else
-            ARCHIVE="$DISTDIR/${BINARY}-${OS}-${ARCH}-${VERSION}.tgz"
-            cd $DISTDIR && tar --create --gzip --file=${ARCHIVE} $DISTDIR/${BINFILE}
+            ARCHIVE="${BINARY}-${OS}-${ARCH}-${VERSION}.tgz"
+            cd $DISTDIR && tar --create --gzip -C $DISTDIR --file=${ARCHIVE} ${BINFILE}
         fi
 
         echo "Uploading ${ARCHIVE}..."
