@@ -153,6 +153,7 @@ func fetchHost(host string) (*http.Response, error) {
 		Timeout: timeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           http.ProxyFromEnvironment,
 		}}
 
 	req, err := http.NewRequest("GET", host, nil)
