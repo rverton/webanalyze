@@ -248,6 +248,7 @@ func process(job *Job) ([]Match, error) {
 	} else {
 		resp, err := fetchHost(job.URL)
 		if err != nil {
+			wa.wgJobs.Done()
 			return nil, fmt.Errorf("Failed to retrieve")
 		}
 
