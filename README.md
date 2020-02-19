@@ -32,30 +32,41 @@ If you want to build for yourself:
 
 The `-update` flags downloads a current version of apps.json from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
 
-## Display
-
-Run `cmd/webanalyze/index.html` (on sth. like SimpleHTTPServer) to display results in a searchable dashboard.
-
 ## Development / Usage as a lib
 
-See `cmd/webanalyze/main.go` for an example.
+See `cmd/webanalyze/main.go` for an example on how to use this as a library.
 
 ## Example
 
-    $ webanalyze -host https://stackshare.io
-    2019/01/05 23:41:45 Scanning with 4 workers.
-    2019/01/05 23:41:46 [+] https://stackshare.io (1.025640074s):
-    2019/01/05 23:41:46 	- jQuery,  (JavaScript Libraries)
-    2019/01/05 23:41:46 	- Cowboy,  (Web Frameworks, Web Servers)
-    2019/01/05 23:41:46 	- Erlang,  (Programming Languages)
-    2019/01/05 23:41:46 	- Ruby on Rails,  (Web Frameworks)
-    2019/01/05 23:41:46 	- Ruby,  (Programming Languages)
-    
-    $ webanalyze -host https://stackshare.io -output csv
-    2019/01/05 23:45:04 Scanning with 4 workers.
+    $ ./webanalyze -host robinverton.de -crawl 1
+     :: webanalyze        : v1.0
+     :: workers           : 4
+     :: apps              : apps.json
+     :: crawl count       : 1
+     :: search subdomains : true
+
+    https://robinverton.de/hire/ (0.5s):
+        Highlight.js,  (Miscellaneous)
+        Netlify,  (Web Servers, CDN)
+        Google Font API,  (Font Scripts)
+    http://robinverton.de (0.8s):
+        Highlight.js,  (Miscellaneous)
+        Netlify,  (Web Servers, CDN)
+        Hugo, 0.42.1 (Static Site Generator)
+        Google Font API,  (Font Scripts)
+
+    $ ./webanalyze -host robinverton.de -crawl 1 -output csv
+     :: webanalyze        : v1.0
+     :: workers           : 4
+     :: apps              : apps.json
+     :: crawl count       : 1
+     :: search subdomains : true
+
     Host,Category,App,Version
-    https://stackshare.io,"Web Frameworks,Web Servers",Cowboy,
-    https://stackshare.io,Programming Languages,Erlang,
-    https://stackshare.io,Web Frameworks,Ruby on Rails,
-    https://stackshare.io,Programming Languages,Ruby,
-    https://stackshare.io,JavaScript Libraries,jQuery,
+    https://robinverton.de/hire/,Miscellaneous,Highlight.js,
+    https://robinverton.de/hire/,Font Scripts,Google Font API,
+    https://robinverton.de/hire/,"Web Servers,CDN",Netlify,
+    http://robinverton.de,"Web Servers,CDN",Netlify,
+    http://robinverton.de,Static Site Generator,Hugo,0.42.1
+    http://robinverton.de,Miscellaneous,Highlight.js,
+    http://robinverton.de,Font Scripts,Google Font API,

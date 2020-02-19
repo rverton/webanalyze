@@ -39,7 +39,8 @@ type Match struct {
 
 // WebAnalyzer types holds an analyzation job
 type WebAnalyzer struct {
-	appDefs *AppsDefinition
+	appDefs   *AppsDefinition
+	scheduler chan *Job
 }
 
 func (m *Match) updateVersion(version string) {
@@ -48,18 +49,21 @@ func (m *Match) updateVersion(version string) {
 	}
 }
 
-// NewWebAnalyzer returns an analyzer struct for an ongoing job, which may be
+// NewWebAnalyzer initializes webanalyzer by passing a filename of the
+// app definition and an schedulerChan, which allows the scanner to
+// add scan jobs on its own
 func NewWebAnalyzer(appsFile string) (*WebAnalyzer, error) {
-	var err error
 	wa := new(WebAnalyzer)
-	if err = wa.loadApps(appsFile); err != nil {
+
+	if err := wa.loadApps(appsFile); err != nil {
 		return nil, err
 	}
+
 	return wa, nil
 }
 
 // worker loops until channel is closed. processes a single host at once
-func (wa *WebAnalyzer) Process(job *Job) Result {
+func (wa *WebAnalyzer) Process(job *Job) (Result, []string) {
 
 	// fix missing http scheme
 	u, err := url.Parse(job.URL)
@@ -70,7 +74,7 @@ func (wa *WebAnalyzer) Process(job *Job) Result {
 
 	// measure time
 	t0 := time.Now()
-	result, err := process(job, wa.appDefs)
+	result, links, err := process(job, wa.appDefs)
 	t1 := time.Now()
 
 	res := Result{
@@ -79,10 +83,14 @@ func (wa *WebAnalyzer) Process(job *Job) Result {
 		Duration: t1.Sub(t0),
 		Error:    err,
 	}
-	return res
+	return res, links
 }
 
 func (wa *WebAnalyzer) CategoryById(cid string) string {
+	if _, ok := wa.appDefs.Cats[cid]; !ok {
+		return ""
+	}
+
 	return wa.appDefs.Cats[cid].Name
 }
 
@@ -139,6 +147,11 @@ func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []st
 			return
 		}
 
+		// only allow http/https
+		if u.Scheme != "http" && u.Scheme != "https" {
+			return
+		}
+
 		urlResolved := base.ResolveReference(u)
 
 		if !searchSubdomain && urlResolved.Hostname() != base.Hostname() {
@@ -169,7 +182,7 @@ func isSubdomain(base, u *url.URL) bool {
 }
 
 // do http request and analyze response
-func process(job *Job, appDefs *AppsDefinition) ([]Match, error) {
+func process(job *Job, appDefs *AppsDefinition) ([]Match, []string, error) {
 	var apps = make([]Match, 0)
 	var err error
 
@@ -177,6 +190,7 @@ func process(job *Job, appDefs *AppsDefinition) ([]Match, error) {
 	var cookiesMap = make(map[string]string)
 	var body []byte
 	var headers http.Header
+	var links []string
 
 	// get response from host if allowed
 	if job.forceNotDownload {
@@ -186,7 +200,7 @@ func process(job *Job, appDefs *AppsDefinition) ([]Match, error) {
 	} else {
 		resp, err := fetchHost(job.URL)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to retrieve")
+			return nil, links, fmt.Errorf("Failed to retrieve")
 		}
 
 		defer resp.Body.Close()
@@ -204,19 +218,19 @@ func process(job *Job, appDefs *AppsDefinition) ([]Match, error) {
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
-		return nil, err
+		return nil, links, err
 	}
 
 	// handle crawling
 	if job.Crawl > 0 {
 		base, _ := url.Parse(job.URL)
 
-		for c, _ := range parseLinks(doc, base, job.SearchSubdomain) {
+		for c, link := range parseLinks(doc, base, job.SearchSubdomain) {
 			if c >= job.Crawl {
 				break
 			}
 
-			//newJob := NewOnlineJob(link, "", nil, 0, false)
+			links = append(links, link)
 		}
 	}
 
@@ -312,7 +326,7 @@ func process(job *Job, appDefs *AppsDefinition) ([]Match, error) {
 		}
 	}
 
-	return apps, nil
+	return apps, links, nil
 }
 
 // runs a list of regexes on content
