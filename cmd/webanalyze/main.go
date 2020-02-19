@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/rverton/webanalyze"
 )
@@ -43,8 +46,13 @@ func init() {
 }
 
 func main() {
-	var file io.ReadCloser
-	var err error
+	var (
+		file io.ReadCloser
+		err  error
+		wa   *webanalyze.WebAnalyzer
+
+		outWriter *csv.Writer
+	)
 
 	flag.Parse()
 
@@ -78,18 +86,9 @@ func main() {
 	}
 	defer file.Close()
 
-	results, err := webanalyze.Init(workers, file, apps, crawlCount, searchSubdomain)
-
-	if err != nil {
-		log.Fatal("error initializing:", err)
+	if wa, err = webanalyze.NewWebAnalyzer(apps); err != nil {
+		log.Fatalf("initialization failed: %v", err)
 	}
-
-	log.Printf("Scanning with %v workers.", workers)
-
-	var (
-		res       []webanalyze.Result
-		outWriter *csv.Writer
-	)
 
 	if outputMethod == "csv" {
 		outWriter = csv.NewWriter(os.Stdout)
@@ -99,59 +98,96 @@ func main() {
 
 	}
 
-	for result := range results {
-		res = append(res, result)
+	printHeader()
 
-		if result.Error != nil {
-			log.Printf("[-] Error for %v: %v", result.Host, result.Error)
-		}
+	var wg sync.WaitGroup
+	hosts := make(chan string)
 
-		switch outputMethod {
-		case "stdout":
-			log.Printf("[+] %v (%v):\n", result.Host, result.Duration)
-			for _, a := range result.Matches {
+	for i := 0; i < workers; i++ {
+		wg.Add(1)
+		go func() {
 
-				var categories []string
+			for host := range hosts {
+				job := webanalyze.NewOnlineJob(host, "", nil, crawlCount, searchSubdomain)
 
-				for _, cid := range a.App.Cats {
-					categories = append(categories, webanalyze.AppDefs.Cats[string(cid)].Name)
+				result := wa.Process(job)
+
+				if result.Error != nil {
+					fmt.Printf("%v: error: %v", result.Host, result.Error)
 				}
 
-				log.Printf("\t- %v, %v (%v)\n", a.AppName, a.Version, strings.Join(categories, ", "))
-			}
-			if len(result.Matches) <= 0 {
-				log.Printf("\t<no results>\n")
-			}
+				switch outputMethod {
+				case "stdout":
+					fmt.Printf("%v (%v):\n", result.Host, result.Duration)
+					for _, a := range result.Matches {
 
-		case "csv":
-			for _, m := range result.Matches {
-				outWriter.Write(
-					[]string{
+						var categories []string
+
+						for _, cid := range a.App.Cats {
+							categories = append(categories, wa.CategoryById(cid))
+						}
+
+						fmt.Printf("    %v, %v (%v)\n", a.AppName, a.Version, strings.Join(categories, ", "))
+					}
+					if len(result.Matches) <= 0 {
+						fmt.Printf("    <no results>\n")
+					}
+
+				case "csv":
+					for _, m := range result.Matches {
+						outWriter.Write(
+							[]string{
+								result.Host,
+								strings.Join(m.CatNames, ","),
+								m.AppName,
+								m.Version,
+							},
+						)
+					}
+					outWriter.Flush()
+				case "json":
+
+					output := struct {
+						Hostname string             `json:"hostname"`
+						Matches  []webanalyze.Match `json:"matches"`
+					}{
 						result.Host,
-						strings.Join(m.CatNames, ","),
-						m.AppName,
-						m.Version,
-					},
-				)
-			}
-			outWriter.Flush()
-		case "json":
+						result.Matches,
+					}
 
-			output := struct {
-				Hostname string             `json:"hostname"`
-				Matches  []webanalyze.Match `json:"matches"`
-			}{
-				result.Host,
-				result.Matches,
+					b, err := json.Marshal(output)
+					if err != nil {
+						log.Printf("cannot marshal output: %v\n", err)
+					}
+
+					b = append(b, '\n')
+					os.Stdout.Write(b)
+				}
 			}
 
-			b, err := json.Marshal(output)
-			if err != nil {
-				log.Printf("cannot marshal output: %v\n", err)
-			}
-
-			b = append(b, '\n')
-			os.Stdout.Write(b)
-		}
+			wg.Done()
+		}()
 	}
+
+	// read hosts from file
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		hosts <- scanner.Text()
+	}
+
+	close(hosts)
+	wg.Wait()
+}
+
+func printHeader() {
+	printOption("webanalyze", "v"+webanalyze.VERSION)
+	printOption("workers", workers)
+	printOption("apps", apps)
+	printOption("crawl count", crawlCount)
+	printOption("search subdomains", searchSubdomain)
+	fmt.Printf("\n")
+}
+
+func printOption(name string, value interface{}) {
+	fmt.Fprintf(os.Stderr, " :: %-14s : %v\n", name, value)
 }

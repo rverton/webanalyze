@@ -1,25 +1,22 @@
 package webanalyze
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/bobesa/go-domain-util/domainutil"
 )
 
+const VERSION = "1.0"
+
 var (
-	// AppDefs provides access to the unmarshalled apps.json file
-	AppDefs *AppsDefinition
 	timeout = 8 * time.Second
 	wa      *WebAnalyzer
 )
@@ -42,11 +39,7 @@ type Match struct {
 
 // WebAnalyzer types holds an analyzation job
 type WebAnalyzer struct {
-	wg      *sync.WaitGroup
-	Results chan Result
-
-	wgJobs *sync.WaitGroup
-	jobs   chan *Job
+	appDefs *AppsDefinition
 }
 
 func (m *Match) updateVersion(version string) {
@@ -55,97 +48,42 @@ func (m *Match) updateVersion(version string) {
 	}
 }
 
-// Init sets up all the workders, reads in the host data and returns the results channel or an error
-func Init(workers int, hosts io.Reader, appsFile string, crawlCount int, searchSubdomain bool) (chan Result, error) {
-	var err error
-	wa, err = NewWebAnalyzer(workers, appsFile)
-	if err != nil {
-		return nil, err
-	}
-
-	// increment wg for outer root url loop
-	wa.wgJobs.Add(1)
-
-	// send hosts line by line to worker channel
-	go func(hosts io.Reader, wa *WebAnalyzer) {
-		scanner := bufio.NewScanner(hosts)
-		for scanner.Scan() {
-			url := scanner.Text()
-			wa.schedule(NewOnlineJob(url, "", nil, crawlCount, searchSubdomain))
-
-			// increment wg for each to be crawled page
-			if crawlCount > 0 {
-				wa.wgJobs.Add(1)
-			}
-		}
-		wa.wgJobs.Done()
-
-		// wait for workers to finish, the close result channel to signal finish of scan
-		wa.close()
-	}(hosts, wa)
-	return wa.Results, nil
-}
-
 // NewWebAnalyzer returns an analyzer struct for an ongoing job, which may be
-// "fed" jobs via a method and returns them via a channel when complete.
-func NewWebAnalyzer(workers int, appsFile string) (*WebAnalyzer, error) {
+func NewWebAnalyzer(appsFile string) (*WebAnalyzer, error) {
+	var err error
 	wa := new(WebAnalyzer)
-	wa.Results = make(chan Result)
-	wa.jobs = make(chan *Job)
-	wa.wg = new(sync.WaitGroup)
-	wa.wgJobs = new(sync.WaitGroup)
-	if err := loadApps(appsFile); err != nil {
+	if err = wa.loadApps(appsFile); err != nil {
 		return nil, err
 	}
-	// start workers
-	initWorker(workers, wa.jobs, wa.Results, wa.wg)
 	return wa, nil
 }
 
-func (wa *WebAnalyzer) schedule(job *Job) {
-	wa.jobs <- job
-}
-
-func (wa *WebAnalyzer) close() {
-	wa.wgJobs.Wait()
-	close(wa.jobs)
-
-	wa.wg.Wait()
-	close(wa.Results)
-}
-
-// start n worker and let them listen on channel c for hosts to scan
-func initWorker(count int, c chan *Job, results chan Result, wg *sync.WaitGroup) {
-	// start workers based on flag
-	for i := 0; i < count; i++ {
-		wg.Add(1)
-		go worker(c, results, wg)
-	}
-}
-
 // worker loops until channel is closed. processes a single host at once
-func worker(c chan *Job, results chan Result, wg *sync.WaitGroup) {
-	for job := range c {
+func (wa *WebAnalyzer) Process(job *Job) Result {
 
-		u, err := url.Parse(job.URL)
-		if u.Scheme == "" {
-			u.Scheme = "http"
-		}
-		job.URL = u.String()
-
-		t0 := time.Now()
-		result, err := process(job)
-		t1 := time.Now()
-
-		res := Result{
-			Host:     job.URL,
-			Matches:  result,
-			Duration: t1.Sub(t0),
-			Error:    err,
-		}
-		results <- res
+	// fix missing http scheme
+	u, err := url.Parse(job.URL)
+	if u.Scheme == "" {
+		u.Scheme = "http"
 	}
-	wg.Done()
+	job.URL = u.String()
+
+	// measure time
+	t0 := time.Now()
+	result, err := process(job, wa.appDefs)
+	t1 := time.Now()
+
+	res := Result{
+		Host:     job.URL,
+		Matches:  result,
+		Duration: t1.Sub(t0),
+		Error:    err,
+	}
+	return res
+}
+
+func (wa *WebAnalyzer) CategoryById(cid string) string {
+	return wa.appDefs.Cats[cid].Name
 }
 
 func fetchHost(host string) (*http.Response, error) {
@@ -231,7 +169,7 @@ func isSubdomain(base, u *url.URL) bool {
 }
 
 // do http request and analyze response
-func process(job *Job) ([]Match, error) {
+func process(job *Job, appDefs *AppsDefinition) ([]Match, error) {
 	var apps = make([]Match, 0)
 	var err error
 
@@ -248,7 +186,6 @@ func process(job *Job) ([]Match, error) {
 	} else {
 		resp, err := fetchHost(job.URL)
 		if err != nil {
-			wa.wgJobs.Done()
 			return nil, fmt.Errorf("Failed to retrieve")
 		}
 
@@ -274,16 +211,16 @@ func process(job *Job) ([]Match, error) {
 	if job.Crawl > 0 {
 		base, _ := url.Parse(job.URL)
 
-		for c, link := range parseLinks(doc, base, job.SearchSubdomain) {
+		for c, _ := range parseLinks(doc, base, job.SearchSubdomain) {
 			if c >= job.Crawl {
 				break
 			}
-			wa.schedule(NewOnlineJob(link, "", nil, 0, false))
+
+			//newJob := NewOnlineJob(link, "", nil, 0, false)
 		}
-		wa.wgJobs.Done()
 	}
 
-	for appname, app := range AppDefs.Apps {
+	for appname, app := range appDefs.Apps {
 		// TODO: Reduce complexity in this for-loop by functionalising out
 		// the sub-loops and checks.
 
@@ -358,7 +295,7 @@ func process(job *Job) ([]Match, error) {
 
 			// handle implies
 			for _, implies := range app.Implies {
-				for implyAppname, implyApp := range AppDefs.Apps {
+				for implyAppname, implyApp := range appDefs.Apps {
 					if implies != implyAppname {
 						continue
 					}
@@ -401,11 +338,6 @@ func findMatches(content string, regexes []AppRegexp) ([][]string, string) {
 
 // parses a version against matches
 func findVersion(matches [][]string, version string) string {
-	/*
-		log.Printf("Matches: %v", matches)
-		log.Printf("Version: %v", version)
-	*/
-
 	var v string
 
 	for _, matchPair := range matches {

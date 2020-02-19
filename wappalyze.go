@@ -121,7 +121,7 @@ func DownloadFile(from, to string) error {
 }
 
 // load apps from file
-func loadApps(filename string) error {
+func (wa *WebAnalyzer) loadApps(filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -129,13 +129,13 @@ func loadApps(filename string) error {
 	defer f.Close()
 
 	dec := json.NewDecoder(f)
-	if err = dec.Decode(&AppDefs); err != nil {
+	if err = dec.Decode(&wa.appDefs); err != nil {
 		return err
 	}
 
-	for key, value := range AppDefs.Apps {
+	for key, value := range wa.appDefs.Apps {
 
-		app := AppDefs.Apps[key]
+		app := wa.appDefs.Apps[key]
 
 		app.HTMLRegex = compileRegexes(value.HTML)
 		app.ScriptRegex = compileRegexes(value.Script)
@@ -148,12 +148,12 @@ func loadApps(filename string) error {
 		app.CatNames = make([]string, 0)
 
 		for _, cid := range app.Cats {
-			if category, ok := AppDefs.Cats[string(cid)]; ok && category.Name != "" {
+			if category, ok := wa.appDefs.Cats[string(cid)]; ok && category.Name != "" {
 				app.CatNames = append(app.CatNames, category.Name)
 			}
 		}
 
-		AppDefs.Apps[key] = app
+		wa.appDefs.Apps[key] = app
 
 	}
 
