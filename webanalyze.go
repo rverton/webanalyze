@@ -151,11 +151,6 @@ func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []st
 			return
 		}
 
-		// only allow http/https
-		if u.Scheme != "http" && u.Scheme != "https" {
-			return
-		}
-
 		urlResolved := base.ResolveReference(u)
 
 		if !searchSubdomain && urlResolved.Hostname() != base.Hostname() {
@@ -171,6 +166,11 @@ func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []st
 		}
 
 		if sameUrl(base, urlResolved) {
+			return
+		}
+
+		// only allow http/https
+		if urlResolved.Scheme != "http" && urlResolved.Scheme != "https" {
 			return
 		}
 
