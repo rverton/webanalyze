@@ -25,6 +25,7 @@ var (
 	hosts           string
 	crawlCount      int
 	searchSubdomain bool
+	silent		bool
 )
 
 func init() {
@@ -36,6 +37,7 @@ func init() {
 	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
 	flag.BoolVar(&searchSubdomain, "search", true, "searches all urls with same base domain (i.e. example.com and sub.example.com)")
+	flag.BoolVar(&silent, "silent", false, "avoid printing header (default false)")
 }
 
 func main() {
@@ -95,7 +97,9 @@ func main() {
 		log.Fatalf("initialization failed: %v", err)
 	}
 
-	printHeader()
+	if !silent {
+		printHeader()
+	}
 
 	for i := 0; i < workers; i++ {
 		wg.Add(1)
