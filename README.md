@@ -24,6 +24,8 @@ If you want to build for yourself:
             output format (stdout|csv|json) (default "stdout")
       -search
             searches all urls with same base domain (i.e. example.com and sub.example.com) (default true)
+      -silent
+    	    avoid printing header (default false)
       -update
             update apps file
       -worker int
