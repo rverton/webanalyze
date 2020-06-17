@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -49,13 +50,13 @@ func (m *Match) updateVersion(version string) {
 	}
 }
 
-// NewWebAnalyzer initializes webanalyzer by passing a filename of the
+// NewWebAnalyzer initializes webanalyzer by passing a reader of the
 // app definition and an schedulerChan, which allows the scanner to
 // add scan jobs on its own
-func NewWebAnalyzer(appsFile string) (*WebAnalyzer, error) {
+func NewWebAnalyzer(apps io.Reader) (*WebAnalyzer, error) {
 	wa := new(WebAnalyzer)
 
-	if err := wa.loadApps(appsFile); err != nil {
+	if err := wa.loadApps(apps); err != nil {
 		return nil, err
 	}
 
