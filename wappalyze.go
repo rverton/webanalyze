@@ -120,16 +120,10 @@ func DownloadFile(from, to string) error {
 	return err
 }
 
-// load apps from file
-func (wa *WebAnalyzer) loadApps(filename string) error {
-	f, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	dec := json.NewDecoder(f)
-	if err = dec.Decode(&wa.appDefs); err != nil {
+// load apps from io.Reader
+func (wa *WebAnalyzer) loadApps(r io.Reader) error {
+	dec := json.NewDecoder(r)
+	if err := dec.Decode(&wa.appDefs); err != nil {
 		return err
 	}
 

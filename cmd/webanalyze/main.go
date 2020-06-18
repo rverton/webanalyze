@@ -93,7 +93,12 @@ func main() {
 	var wg sync.WaitGroup
 	hosts := make(chan string)
 
-	if wa, err = webanalyze.NewWebAnalyzer(apps); err != nil {
+	appsFile, err := os.Open(apps)
+	if err != nil {
+		log.Fatalf("error: can not open apps file %s: %s", apps, err)
+	}
+	defer appsFile.Close()
+	if wa, err = webanalyze.NewWebAnalyzer(appsFile); err != nil {
 		log.Fatalf("initialization failed: %v", err)
 	}
 
