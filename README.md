@@ -8,7 +8,7 @@ Precompiled releases can be downloaded directly [here](https://github.com/rverto
 
 If you want to build for yourself:
 
-    $ go get -u github.com/rverton/webanalyze/...
+    $ go get -v -u github.com/rverton/webanalyze/cmd/webanalyze
     $ webanalyze -update # loads new apps.json file from wappalyzer project
     $ webanalyze -h
     Usage of webanalyze:
