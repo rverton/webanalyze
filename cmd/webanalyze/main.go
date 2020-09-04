@@ -98,7 +98,7 @@ func main() {
 		log.Fatalf("error: can not open apps file %s: %s", apps, err)
 	}
 	defer appsFile.Close()
-	if wa, err = webanalyze.NewWebAnalyzer(appsFile); err != nil {
+	if wa, err = webanalyze.NewWebAnalyzer(appsFile, nil); err != nil {
 		log.Fatalf("initialization failed: %v", err)
 	}
 

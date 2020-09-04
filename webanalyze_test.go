@@ -106,7 +106,7 @@ func TestRedirect(t *testing.T) {
 		testServer2.Close()
 	}()
 
-	resp, err := fetchHost(testServer2.URL)
+	resp, err := fetchHost(testServer2.URL, nil)
 
 	if err != nil {
 		t.Fatal(err)
