@@ -42,6 +42,7 @@ type Match struct {
 type WebAnalyzer struct {
 	appDefs   *AppsDefinition
 	scheduler chan *Job
+	client    *http.Client
 }
 
 func (m *Match) updateVersion(version string) {
@@ -53,12 +54,15 @@ func (m *Match) updateVersion(version string) {
 // NewWebAnalyzer initializes webanalyzer by passing a reader of the
 // app definition and an schedulerChan, which allows the scanner to
 // add scan jobs on its own
-func NewWebAnalyzer(apps io.Reader) (*WebAnalyzer, error) {
+func NewWebAnalyzer(apps io.Reader, client *http.Client) (*WebAnalyzer, error) {
 	wa := new(WebAnalyzer)
 
 	if err := wa.loadApps(apps); err != nil {
 		return nil, err
 	}
+
+
+	wa.client = client
 
 	return wa, nil
 }
@@ -75,7 +79,7 @@ func (wa *WebAnalyzer) Process(job *Job) (Result, []string) {
 
 	// measure time
 	t0 := time.Now()
-	result, links, err := process(job, wa.appDefs)
+	result, links, err := wa.process(job, wa.appDefs)
 	t1 := time.Now()
 
 	res := Result{
@@ -95,18 +99,19 @@ func (wa *WebAnalyzer) CategoryById(cid string) string {
 	return wa.appDefs.Cats[cid].Name
 }
 
-func fetchHost(host string) (*http.Response, error) {
-	client := &http.Client{
-		Timeout: timeout,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyFromEnvironment,
-		},
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
+func fetchHost(host string, client *http.Client) (*http.Response, error) {
+	if client == nil {
+		client = &http.Client{
+			Timeout: timeout,
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				Proxy:           http.ProxyFromEnvironment,
+			},
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}
 	}
-
 	req, err := http.NewRequest("GET", host, nil)
 	if err != nil {
 		return nil, err
@@ -187,7 +192,7 @@ func isSubdomain(base, u *url.URL) bool {
 }
 
 // do http request and analyze response
-func process(job *Job, appDefs *AppsDefinition) ([]Match, []string, error) {
+func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []string, error) {
 	var apps = make([]Match, 0)
 	var err error
 
@@ -203,7 +208,7 @@ func process(job *Job, appDefs *AppsDefinition) ([]Match, []string, error) {
 		headers = job.Headers
 		cookies = job.Cookies
 	} else {
-		resp, err := fetchHost(job.URL)
+		resp, err := fetchHost(job.URL, wa.client)
 		if err != nil {
 			return nil, links, fmt.Errorf("Failed to retrieve: %v", err)
 		}
