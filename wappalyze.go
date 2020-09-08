@@ -11,7 +11,7 @@ import (
 )
 
 // WappalyzerURL is the link to the latest apps.json file in the Wappalyzer repo
-const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/apps.json"
+const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/technologies.json"
 
 // StringArray type is a wrapper for []string for use in unmarshalling the apps.json
 type StringArray []string
@@ -44,7 +44,7 @@ type Category struct {
 
 // AppsDefinition type encapsulates the json encoding of the whole apps.json file
 type AppsDefinition struct {
-	Apps map[string]App      `json:"apps"`
+	Apps map[string]App      `json:"technologies"`
 	Cats map[string]Category `json:"categories"`
 }
 
