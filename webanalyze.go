@@ -210,7 +210,7 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 	} else {
 		resp, err := fetchHost(job.URL, wa.client)
 		if err != nil {
-			return nil, links, fmt.Errorf("Failed to retrieve: %v", err)
+			return nil, links, fmt.Errorf("Failed to retrieve: %w", err)
 		}
 
 		defer resp.Body.Close()
