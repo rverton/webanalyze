@@ -61,7 +61,6 @@ func NewWebAnalyzer(apps io.Reader, client *http.Client) (*WebAnalyzer, error) {
 		return nil, err
 	}
 
-
 	wa.client = client
 
 	return wa, nil
@@ -108,7 +107,17 @@ func fetchHost(host string, client *http.Client) (*http.Response, error) {
 				Proxy:           http.ProxyFromEnvironment,
 			},
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
+				url, err := url.Parse(host)
+				if err != nil {
+					return http.ErrUseLastResponse
+				}
+
+				// allow redirects from http -> https on the same host
+				if url.Host != via[len(via)-1].URL.Host {
+					return http.ErrUseLastResponse
+				}
+
+				return nil
 			},
 		}
 	}
