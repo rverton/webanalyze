@@ -143,6 +143,38 @@ func sameUrl(u1, u2 *url.URL) bool {
 		u1.RequestURI() == u2.RequestURI()
 }
 
+func resolveLink( base *url.URL, val string, searchSubdomain bool ) string {
+	u, err := url.Parse(val)
+	if err != nil {
+		return ""
+	}
+
+	urlResolved := base.ResolveReference(u)
+
+	if !searchSubdomain && urlResolved.Hostname() != base.Hostname() {
+		return ""
+	}
+
+	if searchSubdomain && !isSubdomain(base, u) {
+		return ""
+	}
+
+	if urlResolved.RequestURI() == "" {
+		urlResolved.Path = "/"
+	}
+
+	if sameUrl(base, urlResolved) {
+		return ""
+	}
+
+	// only allow http/https
+	if urlResolved.Scheme != "http" && urlResolved.Scheme != "https" {
+		return ""
+	}
+
+	return urlResolved.String()
+}
+
 func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []string {
 	var links []string
 
@@ -152,36 +184,10 @@ func parseLinks(doc *goquery.Document, base *url.URL, searchSubdomain bool) []st
 			return
 		}
 
-		u, err := url.Parse(val)
-		if err != nil {
-			return
+		u := resolveLink(base, val, searchSubdomain)
+		if u != "" {
+			links = append(links, u)
 		}
-
-		urlResolved := base.ResolveReference(u)
-
-		if !searchSubdomain && urlResolved.Hostname() != base.Hostname() {
-			return
-		}
-
-		if searchSubdomain && !isSubdomain(base, u) {
-			return
-		}
-
-		if urlResolved.RequestURI() == "" {
-			urlResolved.Path = "/"
-		}
-
-		if sameUrl(base, urlResolved) {
-			return
-		}
-
-		// only allow http/https
-		if urlResolved.Scheme != "http" && urlResolved.Scheme != "https" {
-			return
-		}
-
-		links = append(links, urlResolved.String())
-
 	})
 
 	return unique(links)
@@ -221,7 +227,11 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 			if job.followRedirect {
 				for k, v := range resp.Header {
 					if k == "Location" {
-						links = append(links, v[0])
+						base, _ := url.Parse(job.URL)
+						u := resolveLink(base, v[0], job.SearchSubdomain)
+						if u != "" {
+							links = append(links, v[0])
+						}
 					}
 				}
 			}
