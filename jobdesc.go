@@ -20,6 +20,7 @@ type Job struct {
 	Crawl            int
 	SearchSubdomain  bool
 	forceNotDownload bool
+	followRedirect   bool
 }
 
 // NewOfflineJob constructs a job out of the constituents of a
@@ -35,6 +36,7 @@ func NewOfflineJob(url, body string, headers map[string][]string) *Job {
 		Crawl:            0,
 		SearchSubdomain:  false,
 		forceNotDownload: true,
+		followRedirect:   false,
 	}
 }
 
@@ -42,7 +44,7 @@ func NewOfflineJob(url, body string, headers map[string][]string) *Job {
 // or a URL, Body and Headers. If it contains at least a URL and Body,
 // then webanalyzer will not re-download the data, but if a Body is
 // absent then downloading will be attempted.
-func NewOnlineJob(url, body string, headers map[string][]string, crawlCount int, searchSubdomain bool) *Job {
+func NewOnlineJob(url, body string, headers map[string][]string, crawlCount int, searchSubdomain bool, redirect bool) *Job {
 	return &Job{
 		URL:              url,
 		Body:             []byte(body),
@@ -50,5 +52,6 @@ func NewOnlineJob(url, body string, headers map[string][]string, crawlCount int,
 		Crawl:            crawlCount,
 		SearchSubdomain:  searchSubdomain,
 		forceNotDownload: false,
+		followRedirect:   redirect,
 	}
 }

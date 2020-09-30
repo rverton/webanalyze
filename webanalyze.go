@@ -218,6 +218,13 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 		body, err = ioutil.ReadAll(resp.Body)
 		if err == nil {
 			headers = resp.Header
+			if job.followRedirect {
+				for k, v := range resp.Header {
+					if k == "Location" {
+						links = append(links, v[0])
+					}
+				}
+			}
 			cookies = resp.Cookies()
 		}
 	}
