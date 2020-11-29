@@ -26,6 +26,7 @@ var (
 	crawlCount      int
 	searchSubdomain bool
 	silent		bool
+	redirect        bool
 )
 
 func init() {
@@ -38,6 +39,7 @@ func init() {
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
 	flag.BoolVar(&searchSubdomain, "search", true, "searches all urls with same base domain (i.e. example.com and sub.example.com)")
 	flag.BoolVar(&silent, "silent", false, "avoid printing header (default false)")
+	flag.BoolVar(&redirect, "redirect", true, "follow http redirects (default true)")
 }
 
 func main() {
@@ -111,12 +113,12 @@ func main() {
 		go func() {
 
 			for host := range hosts {
-				job := webanalyze.NewOnlineJob(host, "", nil, crawlCount, searchSubdomain)
+				job := webanalyze.NewOnlineJob(host, "", nil, crawlCount, searchSubdomain, redirect)
 				result, links := wa.Process(job)
 
 				if searchSubdomain {
 					for _, v := range links {
-						crawlJob := webanalyze.NewOnlineJob(v, "", nil, 0, false)
+						crawlJob := webanalyze.NewOnlineJob(v, "", nil, 0, false, redirect)
 						result, _ := wa.Process(crawlJob)
 						output(result, wa, outWriter)
 					}
@@ -200,6 +202,7 @@ func printHeader() {
 	printOption("apps", apps)
 	printOption("crawl count", crawlCount)
 	printOption("search subdomains", searchSubdomain)
+	printOption("follow redirects", redirect)
 	fmt.Printf("\n")
 }
 
