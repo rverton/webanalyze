@@ -25,7 +25,7 @@ var (
 	hosts           string
 	crawlCount      int
 	searchSubdomain bool
-	silent		bool
+	silent          bool
 	redirect        bool
 )
 
@@ -39,7 +39,7 @@ func init() {
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
 	flag.BoolVar(&searchSubdomain, "search", true, "searches all urls with same base domain (i.e. example.com and sub.example.com)")
 	flag.BoolVar(&silent, "silent", false, "avoid printing header (default false)")
-	flag.BoolVar(&redirect, "redirect", true, "follow http redirects (default true)")
+	flag.BoolVar(&redirect, "redirect", false, "follow http redirects (default false)")
 }
 
 func main() {
