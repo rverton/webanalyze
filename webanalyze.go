@@ -71,6 +71,10 @@ func (wa *WebAnalyzer) Process(job *Job) (Result, []string) {
 
 	// fix missing http scheme
 	u, err := url.Parse(job.URL)
+	if err != nil {
+		return Result{Host: job.URL, Error: err}, []string{}
+	}
+
 	if u.Scheme == "" {
 		u.Scheme = "http"
 	}
@@ -152,7 +156,7 @@ func sameUrl(u1, u2 *url.URL) bool {
 		u1.RequestURI() == u2.RequestURI()
 }
 
-func resolveLink( base *url.URL, val string, searchSubdomain bool ) string {
+func resolveLink(base *url.URL, val string, searchSubdomain bool) string {
 	u, err := url.Parse(val)
 	if err != nil {
 		return ""
