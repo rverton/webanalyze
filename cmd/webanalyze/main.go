@@ -33,7 +33,7 @@ func init() {
 	flag.StringVar(&outputMethod, "output", "stdout", "output format (stdout|csv|json)")
 	flag.BoolVar(&update, "update", false, "update apps file")
 	flag.IntVar(&workers, "worker", 4, "number of worker")
-	flag.StringVar(&apps, "apps", "apps.json", "app definition file.")
+	flag.StringVar(&apps, "apps", "technologies.json", "app definition file.")
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
@@ -59,7 +59,7 @@ func main() {
 	}
 
 	if update {
-		err = webanalyze.DownloadFile(webanalyze.WappalyzerURL, "apps.json")
+		err = webanalyze.DownloadFile(webanalyze.WappalyzerURL, "technologies.json")
 		if err != nil {
 			log.Fatalf("error: can not update apps file: %v", err)
 		}

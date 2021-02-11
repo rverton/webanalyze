@@ -117,7 +117,7 @@ func fetchHost(host string, client *http.Client) (*http.Response, error) {
 				}
 
 				// allow redirects from http -> https on the same host
-				if url.Host != via[len(via)-1].URL.Host {
+				if url.Host != req.URL.Host {
 					return http.ErrUseLastResponse
 				}
 

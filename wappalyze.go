@@ -10,24 +10,24 @@ import (
 	"strings"
 )
 
-// WappalyzerURL is the link to the latest apps.json file in the Wappalyzer repo
+// WappalyzerURL is the link to the latest technologies.json file in the Wappalyzer repo
 const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/technologies.json"
 
-// StringArray type is a wrapper for []string for use in unmarshalling the apps.json
+// StringArray type is a wrapper for []string for use in unmarshalling the technologies.json
 type StringArray []string
 
-// App type encapsulates all the data about an App from apps.json
+// App type encapsulates all the data about an App from technologies.json
 type App struct {
-	Cats     StringArray       `json:"cats"`
-	CatNames []string          `json:"category_names"`
-	Cookies  map[string]string `json:"cookies"`
-	Headers  map[string]string `json:"headers"`
-	Meta     map[string]string `json:"meta"`
-	HTML     StringArray       `json:"html"`
-	Script   StringArray       `json:"script"`
-	URL      StringArray       `json:"url"`
-	Website  string            `json:"website"`
-	Implies  StringArray       `json:"implies"`
+	Cats     StringArray            `json:"cats"`
+	CatNames []string               `json:"category_names"`
+	Cookies  map[string]string      `json:"cookies"`
+	Headers  map[string]string      `json:"headers"`
+	Meta     map[string]StringArray `json:"meta"`
+	HTML     StringArray            `json:"html"`
+	Script   StringArray            `json:"script"`
+	URL      StringArray            `json:"url"`
+	Website  string                 `json:"website"`
+	Implies  StringArray            `json:"implies"`
 
 	HTMLRegex   []AppRegexp `json:"-"`
 	ScriptRegex []AppRegexp `json:"-"`
@@ -42,7 +42,7 @@ type Category struct {
 	Name string `json:"name"`
 }
 
-// AppsDefinition type encapsulates the json encoding of the whole apps.json file
+// AppsDefinition type encapsulates the json encoding of the whole technologies.json file
 type AppsDefinition struct {
 	Apps map[string]App      `json:"technologies"`
 	Cats map[string]Category `json:"categories"`
@@ -75,7 +75,7 @@ func (app *App) FindInHeaders(headers http.Header) (matches [][]string, version 
 	return matches, v
 }
 
-// UnmarshalJSON is a custom unmarshaler for handling bogus apps.json types from wappalyzer
+// UnmarshalJSON is a custom unmarshaler for handling bogus technologies.json types from wappalyzer
 func (t *StringArray) UnmarshalJSON(data []byte) error {
 	var s string
 	var sa []string
@@ -103,7 +103,7 @@ func (t *StringArray) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DownloadFile pulls the latest apps.json file from the Wappalyzer github
+// DownloadFile pulls the latest technologies.json file from the Wappalyzer github
 func DownloadFile(from, to string) error {
 	resp, err := http.Get(from)
 	if err != nil {
@@ -136,8 +136,15 @@ func (wa *WebAnalyzer) loadApps(r io.Reader) error {
 		app.URLRegex = compileRegexes(value.URL)
 
 		app.HeaderRegex = compileNamedRegexes(app.Headers)
-		app.MetaRegex = compileNamedRegexes(app.Meta)
 		app.CookieRegex = compileNamedRegexes(app.Cookies)
+
+		// handle special meta field where value can be a list
+		// of strings. we join them as a simple regex here
+		metaRegex := make(map[string]string)
+		for k, v := range app.Meta {
+			metaRegex[k] = strings.Join(v, "|")
+		}
+		app.MetaRegex = compileNamedRegexes(metaRegex)
 
 		app.CatNames = make([]string, 0)
 

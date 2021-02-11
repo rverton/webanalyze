@@ -9,11 +9,11 @@ Precompiled releases can be downloaded directly [here](https://github.com/rverto
 If you want to build for yourself:
 
     $ go get -v -u github.com/rverton/webanalyze/cmd/webanalyze
-    $ webanalyze -update # loads new apps.json file from wappalyzer project
+    $ webanalyze -update # loads new technologies.json file from wappalyzer project
     $ webanalyze -h
     Usage of webanalyze:
       -apps string
-            app definition file. (default "apps.json")
+            app definition file. (default "technologies.json")
       -crawl int
             links to follow from the root page (default 0)
       -host string
@@ -32,7 +32,7 @@ If you want to build for yourself:
             number of worker (default 4)
 
 
-The `-update` flags downloads a current version of apps.json from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
+The `-update` flags downloads a current version of `technologies.json` from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
 
 ## Development / Usage as a lib
 
@@ -43,7 +43,7 @@ See `cmd/webanalyze/main.go` for an example on how to use this as a library.
     $ ./webanalyze -host robinverton.de -crawl 1
      :: webanalyze        : v1.0
      :: workers           : 4
-     :: apps              : apps.json
+     :: apps              : technologies.json
      :: crawl count       : 1
      :: search subdomains : true
 
@@ -60,7 +60,7 @@ See `cmd/webanalyze/main.go` for an example on how to use this as a library.
     $ ./webanalyze -host robinverton.de -crawl 1 -output csv
      :: webanalyze        : v1.0
      :: workers           : 4
-     :: apps              : apps.json
+     :: apps              : technologies.json
      :: crawl count       : 1
      :: search subdomains : true
 
