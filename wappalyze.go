@@ -178,7 +178,7 @@ func compileNamedRegexes(from map[string]string) []AppRegexp {
 		// Filter out webapplyzer attributes from regular expression
 		splitted := strings.Split(value, "\\;")
 
-		r, err := regexp.Compile(splitted[0])
+		r, err := regexp.Compile("(?i)" + splitted[0])
 		if err != nil {
 			continue
 		}
@@ -202,7 +202,7 @@ func compileRegexes(s StringArray) []AppRegexp {
 		// Split version detection
 		splitted := strings.Split(regexString, "\\;")
 
-		regex, err := regexp.Compile(splitted[0])
+		regex, err := regexp.Compile("(?i)" + splitted[0])
 		if err != nil {
 			// ignore failed compiling for now
 			// log.Printf("warning: compiling regexp for failed: %v", regexString, err)
