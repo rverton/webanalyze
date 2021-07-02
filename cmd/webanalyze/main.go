@@ -64,7 +64,9 @@ func main() {
 			log.Fatalf("error: can not update apps file: %v", err)
 		}
 
-		log.Println("app definition file updated from ", webanalyze.WappalyzerURL)
+    if !silent {
+      log.Println("app definition file updated from ", webanalyze.WappalyzerURL)
+    }
 
 		if host == "" && hosts == "" {
 			return
