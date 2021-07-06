@@ -168,7 +168,7 @@ func resolveLink(base *url.URL, val string, searchSubdomain bool) string {
 		return ""
 	}
 
-	if searchSubdomain && !isSubdomain(base, u) {
+	if searchSubdomain && !isSubdomain(base, urlResolved) {
 		return ""
 	}
 
