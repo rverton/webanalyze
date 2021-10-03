@@ -11,7 +11,7 @@ import (
 )
 
 // WappalyzerURL is the link to the latest technologies.json file in the Wappalyzer repo
-const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/technologies.json"
+const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/wappalyzer/b9b64a9ae173cf317d86b7fb6d8ccb892ea8898d/src/technologies.json"
 
 // StringArray type is a wrapper for []string for use in unmarshalling the technologies.json
 type StringArray []string
