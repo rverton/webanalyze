@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 )
 
-// WappalyzerURL is the link to the latest technologies.json file in the Wappalyzer repo
-const WappalyzerURL = "https://raw.githubusercontent.com/AliasIO/Wappalyzer/master/src/technologies.json"
+const WappazlyerRoot = "https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src"
 
 // StringArray type is a wrapper for []string for use in unmarshalling the technologies.json
 type StringArray []string
@@ -24,7 +23,7 @@ type App struct {
 	Headers  map[string]string      `json:"headers"`
 	Meta     map[string]StringArray `json:"meta"`
 	HTML     StringArray            `json:"html"`
-	Script   StringArray            `json:"script"`
+	Script   StringArray            `json:"scripts"`
 	URL      StringArray            `json:"url"`
 	Website  string                 `json:"website"`
 	Implies  StringArray            `json:"implies"`
@@ -103,21 +102,73 @@ func (t *StringArray) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// DownloadFile pulls the latest technologies.json file from the Wappalyzer github
-func DownloadFile(from, to string) error {
-	resp, err := http.Get(from)
+func downloadTechnologies() (map[string]App, error) {
+	apps := make(map[string]App)
+
+	files := []string{"_", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"}
+
+	count := 0
+	for _, f := range files {
+		m := make(map[string]App)
+		url := fmt.Sprintf("%v/technologies/%v.json", WappazlyerRoot, f)
+		resp, err := http.Get(url)
+		if err != nil {
+			return nil, err
+		}
+		if err := json.NewDecoder(resp.Body).Decode(&m); err != nil {
+			return nil, err
+		}
+
+		for key := range m {
+			apps[key] = m[key]
+			count = count + 1
+		}
+		resp.Body.Close()
+	}
+
+	return apps, nil
+}
+
+func downloadCategories() (map[string]Category, error) {
+
+	url := fmt.Sprintf("%v/categories.json", WappazlyerRoot)
+	resp, err := http.Get(url)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer resp.Body.Close()
 
-	f, err := os.Create(to)
+	m := make(map[string]Category)
+
+	if err := json.NewDecoder(resp.Body).Decode(&m); err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+// DownloadFile pulls the latest technologies.json file from the Wappalyzer github
+func DownloadFile(to string) error {
+	// step1: download categories
+	categories, err := downloadCategories()
 	if err != nil {
 		return err
 	}
 
-	_, err = io.Copy(f, resp.Body)
-	return err
+	// step2: download technoligies from _, a-z
+	appDefs, err := downloadTechnologies()
+	if err != nil {
+		return err
+	}
+
+	technologiesFile := AppsDefinition{
+		Apps: appDefs,
+		Cats: categories,
+	}
+
+	data, _ := json.MarshalIndent(technologiesFile, "", " ")
+
+	return ioutil.WriteFile(to, data, 0644)
 }
 
 // load apps from io.Reader
@@ -198,6 +249,10 @@ func compileRegexes(s StringArray) []AppRegexp {
 	var list []AppRegexp
 
 	for _, regexString := range s {
+
+		if regexString == "" {
+			continue
+		}
 
 		// Split version detection
 		splitted := strings.Split(regexString, "\\;")
