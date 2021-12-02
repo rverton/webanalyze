@@ -1,6 +1,5 @@
 # This is an example .goreleaser.yml file with some sane defaults.
 # Make sure to check the documentation at http://goreleaser.com
-before:
 builds:
   - env:
       - CGO_ENABLED=0
@@ -16,6 +15,8 @@ archives:
       windows: Windows
       386: i386
       amd64: x86_64
+    files:
+      - technologies.json
 checksum:
   name_template: 'checksums.txt'
 snapshot:
