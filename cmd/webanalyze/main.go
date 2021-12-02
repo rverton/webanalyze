@@ -59,13 +59,13 @@ func main() {
 	}
 
 	if update {
-		err = webanalyze.DownloadFile(webanalyze.WappalyzerURL, "technologies.json")
+		err = webanalyze.DownloadFile("technologies.json")
 		if err != nil {
 			log.Fatalf("error: can not update apps file: %v", err)
 		}
 
 		if !silent {
-			log.Println("app definition file updated from ", webanalyze.WappalyzerURL)
+			log.Println("app definition file updated")
 		}
 
 		if host == "" && hosts == "" {
