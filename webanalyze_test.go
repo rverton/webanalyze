@@ -2,9 +2,6 @@ package webanalyze
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"strings"
 	"testing"
@@ -90,31 +87,4 @@ func TestIsSubdomain(t *testing.T) {
 	if !isSubdomain(u1, u3) {
 		t.Fatalf("%v is not a subdomain of %v (but should be)", u2, u1)
 	}
-}
-
-func TestRedirect(t *testing.T) {
-	testServer1 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("should not be reached"))
-	}))
-
-	testServer2 := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, testServer1.URL, http.StatusTemporaryRedirect)
-	}))
-
-	defer func() {
-		testServer1.Close()
-		testServer2.Close()
-	}()
-
-	resp, err := fetchHost(testServer2.URL, nil)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	if string(body) == "should not be reached" {
-		t.Error("fetchHost did follow redirect")
-	}
-
 }

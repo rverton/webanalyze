@@ -15,7 +15,7 @@ import (
 	"github.com/bobesa/go-domain-util/domainutil"
 )
 
-const VERSION = "1.0"
+const VERSION = "0.3.7"
 
 var (
 	timeout = 8 * time.Second
@@ -102,7 +102,7 @@ func (wa *WebAnalyzer) CategoryById(cid string) string {
 	return wa.appDefs.Cats[cid].Name
 }
 
-func fetchHost(host string, client *http.Client) (*http.Response, error) {
+func fetchHost(urlStr string, client *http.Client) (*http.Response, error) {
 	if client == nil {
 		client = &http.Client{
 			Timeout: timeout,
@@ -111,13 +111,13 @@ func fetchHost(host string, client *http.Client) (*http.Response, error) {
 				Proxy:           http.ProxyFromEnvironment,
 			},
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				url, err := url.Parse(host)
+				url, err := url.Parse(urlStr)
 				if err != nil {
 					return http.ErrUseLastResponse
 				}
 
 				// allow redirects from http -> https on the same host
-				if url.Host != req.URL.Host {
+				if url.Hostname() != req.URL.Hostname() {
 					return http.ErrUseLastResponse
 				}
 
@@ -125,7 +125,7 @@ func fetchHost(host string, client *http.Client) (*http.Response, error) {
 			},
 		}
 	}
-	req, err := http.NewRequest("GET", host, nil)
+	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
 		return nil, err
 	}
