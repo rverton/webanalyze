@@ -12,6 +12,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/rverton/webanalyze"
 )
@@ -108,6 +109,15 @@ func main() {
 
 	if !silent {
 		printHeader()
+	}
+
+	appsInfo, err := os.Stat(apps)
+	if err != nil {
+		log.Fatalf("error: cant open %v: %v", apps, err)
+	}
+
+	if appsInfo.ModTime().Before(time.Now().Add(24 * time.Hour * 7 * -1)) {
+		log.Printf("warning: %v is older than a week", apps)
 	}
 
 	for i := 0; i < workers; i++ {
