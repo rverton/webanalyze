@@ -4,12 +4,14 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -21,7 +23,7 @@ var (
 	update          bool
 	outputMethod    string
 	workers         int
-	apps            string
+	techsFilename   string
 	host            string
 	hosts           string
 	crawlCount      int
@@ -32,9 +34,9 @@ var (
 
 func init() {
 	flag.StringVar(&outputMethod, "output", "stdout", "output format (stdout|csv|json)")
-	flag.BoolVar(&update, "update", false, "update apps file")
+	flag.BoolVar(&update, "update", false, "update technologies file to current dir")
 	flag.IntVar(&workers, "worker", 4, "number of worker")
-	flag.StringVar(&apps, "apps", "technologies.json", "app definition file.")
+	flag.StringVar(&techsFilename, "apps", "technologies.json", "technologies definition file")
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
@@ -75,6 +77,12 @@ func main() {
 
 	}
 
+	// lookup technologies.json file
+	techsFilename, err = lookupFolders(techsFilename)
+	if err != nil {
+		log.Fatalf("error: can not open apps file %s: %s", techsFilename, err)
+	}
+
 	// add header if output mode is csv
 	if outputMethod == "csv" {
 		outWriter = csv.NewWriter(os.Stdout)
@@ -98,12 +106,13 @@ func main() {
 	var wg sync.WaitGroup
 	hosts := make(chan string)
 
-	appsFile, err := os.Open(apps)
+	techsFile, err := os.Open(techsFilename)
 	if err != nil {
-		log.Fatalf("error: can not open apps file %s: %s", apps, err)
+		log.Fatalf("error: can not open apps file %s: %s", techsFilename, err)
 	}
-	defer appsFile.Close()
-	if wa, err = webanalyze.NewWebAnalyzer(appsFile, nil); err != nil {
+	defer techsFile.Close()
+
+	if wa, err = webanalyze.NewWebAnalyzer(techsFile, nil); err != nil {
 		log.Fatalf("initialization failed: %v", err)
 	}
 
@@ -111,13 +120,13 @@ func main() {
 		printHeader()
 	}
 
-	appsInfo, err := os.Stat(apps)
+	appsInfo, err := os.Stat(techsFilename)
 	if err != nil {
-		log.Fatalf("error: cant open %v: %v", apps, err)
+		log.Fatalf("error: cant open %v: %v", techsFilename, err)
 	}
 
 	if appsInfo.ModTime().Before(time.Now().Add(24 * time.Hour * 7 * -1)) {
-		log.Printf("warning: %v is older than a week", apps)
+		log.Printf("warning: %v is older than a week", techsFilename)
 	}
 
 	for i := 0; i < workers; i++ {
@@ -211,7 +220,7 @@ func output(result webanalyze.Result, wa *webanalyze.WebAnalyzer, outWriter *csv
 func printHeader() {
 	printOption("webanalyze", "v"+webanalyze.VERSION)
 	printOption("workers", workers)
-	printOption("apps", apps)
+	printOption("technologies", techsFilename)
 	printOption("crawl count", crawlCount)
 	printOption("search subdomains", searchSubdomain)
 	printOption("follow redirects", redirect)
@@ -220,4 +229,21 @@ func printHeader() {
 
 func printOption(name string, value interface{}) {
 	fmt.Fprintf(os.Stderr, " :: %-17s : %v\n", name, value)
+}
+
+func lookupFolders(filename string) (string, error) {
+	executable, _ := os.Executable()
+	home, _ := os.UserHomeDir()
+	folders := []string{"./", executable, home}
+
+	for _, folder := range folders {
+		path := filepath.Join(folder, filename)
+
+		_, err := os.Stat(path)
+		if err == nil {
+			return path, nil
+		}
+	}
+
+	return "", errors.New("could not find technologies file")
 }
