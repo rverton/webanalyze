@@ -4,8 +4,11 @@ This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. Thi
 
 ## Installation and usage
 
+
+### Precompiled releases
 Precompiled releases can be downloaded directly [here](https://github.com/rverton/webanalyze/releases).
 
+### Build
 If you want to build for yourself:
 
     $ go install -v github.com/rverton/webanalyze/cmd/webanalyze@latest
@@ -33,6 +36,17 @@ If you want to build for yourself:
 
 
 The `-update` flags downloads a current version of `technologies.json` from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
+
+### Docker
+
+```bash
+# Clone the repo
+git clone https://github.com/rverton/webanalyze.git
+# Build the container
+docker build -t webanalyze:latest webanalyze
+# Run the container
+docker run -it webanalyze:latest -h
+```
 
 ## Development / Usage as a lib
 
