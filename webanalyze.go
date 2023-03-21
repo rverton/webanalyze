@@ -274,6 +274,8 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 		}
 	}
 
+	scripts := doc.Find("script")
+
 	for appname, app := range appDefs.Apps {
 		// TODO: Reduce complexity in this for-loop by functionalising out
 		// the sub-loops and checks.
@@ -302,7 +304,7 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 		}
 
 		// check script tags
-		doc.Find("script").Each(func(i int, s *goquery.Selection) {
+		scripts.Each(func(i int, s *goquery.Selection) {
 			if script, exists := s.Attr("src"); exists {
 				if m, v := findMatches(script, app.ScriptRegex); len(m) > 0 {
 					findings.Matches = append(findings.Matches, m...)
