@@ -234,7 +234,7 @@ func printOption(name string, value interface{}) {
 func lookupFolders(filename string) (string, error) {
 
 	if filepath.IsAbs(filename) && os.IsNotExist(os.Stat(filename)) {
-		return "", errors.New("could not find the specified file: " + filename)
+		return "", errors.New("could not find the technologies file: " + filename)
 	}
 
 	if filepath.IsAbs(filename) {
@@ -262,5 +262,5 @@ func lookupFolders(filename string) (string, error) {
 		}
 	}
 
-	return "", errors.New("could not find the specified file: " + filename)
+	return "", errors.New("could not find the technologies file: " + filename)
 }
