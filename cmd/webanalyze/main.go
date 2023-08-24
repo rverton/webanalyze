@@ -232,18 +232,35 @@ func printOption(name string, value interface{}) {
 }
 
 func lookupFolders(filename string) (string, error) {
-	executable, _ := os.Executable()
-	home, _ := os.UserHomeDir()
-	folders := []string{"./", executable, home}
+
+	if filepath.IsAbs(filename) && os.IsNotExist(os.Stat(filename)) {
+		return "", errors.New("could not find the specified file: " + filename)
+	}
+
+	if filepath.IsAbs(filename) {
+		return filename, nil
+	}
+
+	executable, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	executableDir := filepath.Dir(executable)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	folders := []string{"./", executableDir, home}
 
 	for _, folder := range folders {
 		path := filepath.Join(folder, filename)
 
-		_, err := os.Stat(path)
-		if err == nil {
+		if _, err := os.Stat(path); err == nil {
 			return path, nil
 		}
 	}
 
-	return "", errors.New("could not find technologies file")
+	return "", errors.New("could not find the specified file: " + filename)
 }
