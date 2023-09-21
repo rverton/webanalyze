@@ -15,7 +15,7 @@ import (
 	"github.com/bobesa/go-domain-util/domainutil"
 )
 
-const VERSION = "0.3.7"
+const VERSION = "0.3.9"
 
 var (
 	timeout = 8 * time.Second
