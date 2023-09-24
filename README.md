@@ -1,6 +1,8 @@
 # webanalyze
 
-This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. This tool is designed to be performant and allows to test huge lists of hosts.
+This is a fork  of [Wappalyzer](https://github.com/rverton/webanalyze/releases) in Go. This tool is designed to be performant and allows to test huge lists of hosts.
+
+👾 Added piping capabilities where the output is a one line csv for each host
 
 ## Installation and usage
 
@@ -11,8 +13,9 @@ Precompiled releases can be downloaded directly [here](https://github.com/rverto
 ### Build
 If you want to build for yourself:
 
-    $ go install -v github.com/rverton/webanalyze/cmd/webanalyze@latest
+    $ go install -v github.com/TheeEclipse/webanalyze/cmd/webanalyze@latest
     $ webanalyze -update # loads new technologies.json file from wappalyzer project
+    Or rather just wget the technologies file
     $ webanalyze -h
     Usage of webanalyze:
       -apps string
@@ -37,52 +40,30 @@ If you want to build for yourself:
 
 The `-update` flags downloads a current version of `technologies.json` from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
 
-### Docker
-
-```bash
-# Clone the repo
-git clone https://github.com/rverton/webanalyze.git
-# Build the container
-docker build -t webanalyze:latest webanalyze
-# Run the container
-docker run -it webanalyze:latest -h
-```
-
-## Development / Usage as a lib
 
 See `cmd/webanalyze/main.go` for an example on how to use this as a library.
 
 ## Example
 
-    $ ./webanalyze -host robinverton.de -crawl 1
-     :: webanalyze        : v1.0
-     :: workers           : 4
-     :: apps              : technologies.json
-     :: crawl count       : 1
-     :: search subdomains : true
+    $ root@Normal-Use-Instance:~# webanalyze -host robinverton.de -crawl 1 -silent
+```http://robinverton.de (0.5s): React,  (JavaScript frameworks) HSTS,  (Security) Netlify,  (PaaS, CDN)```
 
-    https://robinverton.de/hire/ (0.5s):
-        Highlight.js,  (Miscellaneous)
-        Netlify,  (Web Servers, CDN)
-        Google Font API,  (Font Scripts)
-    http://robinverton.de (0.8s):
-        Highlight.js,  (Miscellaneous)
-        Netlify,  (Web Servers, CDN)
-        Hugo, 0.42.1 (Static Site Generator)
-        Google Font API,  (Font Scripts)
+    $ root@Normal-Use-Instance:~# webanalyze -host robinverton.de -crawl 1 -silent | anew 2.txt
+```
+http://robinverton.de (0.5s): HSTS,  (Security) Netlify,  (PaaS, CDN) React,  (JavaScript frameworks)
+root@Normal-Use-Instance:~#
+```
 
-    $ ./webanalyze -host robinverton.de -crawl 1 -output csv
-     :: webanalyze        : v1.0
-     :: workers           : 4
-     :: apps              : technologies.json
-     :: crawl count       : 1
-     :: search subdomains : true
+    $ root@Normal-Use-Instance:~# webanalyze -host robinverton.de -crawl 1
+```
+ :: webanalyze        : v0.3.9
+ :: workers           : 4
+ :: technologies      : technologies.json
+ :: crawl count       : 1
+ :: search subdomains : true
+ :: follow redirects  : false
 
-    Host,Category,App,Version
-    https://robinverton.de/hire/,Miscellaneous,Highlight.js,
-    https://robinverton.de/hire/,Font Scripts,Google Font API,
-    https://robinverton.de/hire/,"Web Servers,CDN",Netlify,
-    http://robinverton.de,"Web Servers,CDN",Netlify,
-    http://robinverton.de,Static Site Generator,Hugo,0.42.1
-    http://robinverton.de,Miscellaneous,Highlight.js,
-    http://robinverton.de,Font Scripts,Google Font API,
+http://robinverton.de (0.5s): React,  (JavaScript frameworks) HSTS,  (Security) Netlify,  (PaaS, CDN)
+root@Normal-Use-Instance:~#
+```
+
