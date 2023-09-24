@@ -1,4 +1,4 @@
-module github.com/TheeEclipse/techdetect
+module  github.com/TheeEclipse/webanalyze
 
 go 1.15
 
