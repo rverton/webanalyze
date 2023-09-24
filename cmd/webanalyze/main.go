@@ -170,7 +170,7 @@ func output(result webanalyze.Result, wa *webanalyze.WebAnalyzer, outWriter *csv
 
 	switch outputMethod {
 	case "stdout":
-		fmt.Printf("%v (%.1fs):\n", result.Host, result.Duration.Seconds())
+		fmt.Printf("%v (%.1fs): ", result.Host, result.Duration.Seconds())
 		for _, a := range result.Matches {
 
 			var categories []string
@@ -179,12 +179,12 @@ func output(result webanalyze.Result, wa *webanalyze.WebAnalyzer, outWriter *csv
 				categories = append(categories, wa.CategoryById(cid))
 			}
 
-			fmt.Printf("    %v, %v (%v)\n", a.AppName, a.Version, strings.Join(categories, ", "))
+			fmt.Printf("%v, %v (%v) ", a.AppName, a.Version, strings.Join(categories, ", "))
 		}
 		if len(result.Matches) <= 0 {
-			fmt.Printf("    <no results>\n")
+			fmt.Printf("<no results>")
 		}
-
+		fmt.Printf("\n")
 	case "csv":
 		for _, m := range result.Matches {
 			outWriter.Write(
