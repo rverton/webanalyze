@@ -1,6 +1,8 @@
 # webanalyze
 
-This is a port of [Wappalyzer](https://github.com/AliasIO/Wappalyzer) in Go. This tool is designed to be performant and allows to test huge lists of hosts.
+This is a port of Wappalyzer in Go. This tool is designed to be performant and allows to test huge lists of hosts.
+
+Because Wappalyzer removed the public access to their app definitions, webanalyze currently loads definitions from [enthec](https://github.com/enthec/webappanalyzer).
 
 ## Installation and usage
 

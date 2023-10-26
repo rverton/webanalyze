@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const WappazlyerRoot = "https://raw.githubusercontent.com/AliasIO/wappalyzer/master/src"
+const WappazlyerRoot = "https://raw.githubusercontent.com/enthec/webappanalyzer/main/src"
 
 // StringArray type is a wrapper for []string for use in unmarshalling the technologies.json
 type StringArray []string
