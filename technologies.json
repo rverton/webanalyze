@@ -2804,6 +2804,20 @@
    "website": "https://www.w3.org/Amaya",
    "implies": null
   },
+  "Amaze UI": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://amazeui.shopxo.net/",
+   "implies": null
+  },
   "Amazon ALB": {
    "cats": [
     "65"
@@ -3208,6 +3222,20 @@
    "website": "https://amplience.com",
    "implies": null
   },
+  "Amplify JS": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://amplifyjs.com/",
+   "implies": null
+  },
   "Amplitude": {
    "cats": [
     "10"
@@ -3370,6 +3398,21 @@
    "implies": [
     "TypeScript"
    ]
+  },
+  "Angular Gridster": {
+   "cats": [
+    "25",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://tiberiuzuld.github.io/angular-gridster2/",
+   "implies": null
   },
   "Angular Material": {
    "cats": [
@@ -3601,6 +3644,20 @@
    "scripts": null,
    "url": null,
    "website": "https://www.anyclip.com",
+   "implies": null
+  },
+  "AnythingSlider": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://css-tricks.com/anythingslider-jquery-plugin/",
    "implies": null
   },
   "Apache APISIX": {
@@ -5485,6 +5542,21 @@
     "PHP"
    ]
   },
+  "Backstretch": {
+   "cats": [
+    "25",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://www.jquery-backstretch.com/",
+   "implies": null
+  },
   "Baidu Analytics (百度统计)": {
    "cats": [
     "10"
@@ -7141,6 +7213,20 @@
    "website": "https://apps.shopify.com/page-speed-optimizer",
    "implies": null
   },
+  "Bootbox.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://bootboxjs.com/",
+   "implies": null
+  },
   "Bootic": {
    "cats": [
     "6"
@@ -8081,6 +8167,20 @@
    "scripts": null,
    "url": null,
    "website": "https://www.open-std.org/jtc1/sc22/wg14/",
+   "implies": null
+  },
+  "C3.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://c3js.org/",
    "implies": null
   },
   "CCV Shop": {
@@ -9576,6 +9676,21 @@
    "scripts": null,
    "url": null,
    "website": "https://getchorus.voxmedia.com",
+   "implies": null
+  },
+  "Chosen": {
+   "cats": [
+    "12",
+    "18"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://harvesthq.github.io/chosen/",
    "implies": null
   },
   "Chronofresh": {
@@ -15785,6 +15900,20 @@
     "Shopify"
    ]
   },
+  "Enquire.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://wicky.nillia.ms/enquire.js/",
+   "implies": null
+  },
   "Ensi": {
    "cats": [
     "6"
@@ -17427,6 +17556,21 @@
    "website": "https://www.fitanalytics.com",
    "implies": null
   },
+  "FitVids.JS": {
+   "cats": [
+    "5",
+    "14"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://fitvidsjs.com/",
+   "implies": null
+  },
   "FlagSmith": {
    "cats": [
     "85"
@@ -17580,6 +17724,21 @@
    "scripts": null,
    "url": null,
    "website": "https://flickity.metafizzy.co",
+   "implies": null
+  },
+  "FlipClock.js": {
+   "cats": [
+    "25",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://flipclock.readthedocs.io/en/dev-1.0.0/CHANGE%20LOG/",
    "implies": null
   },
   "FlippingBook": {
@@ -21834,6 +21993,20 @@
    "website": "https://handlebarsjs.com",
    "implies": null
   },
+  "Handsontable": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://handsontable.com/",
+   "implies": null
+  },
   "Handtalk": {
    "cats": [
     "68"
@@ -22063,6 +22236,21 @@
    "scripts": null,
    "url": null,
    "website": "https://headlessui.dev",
+   "implies": null
+  },
+  "Headroom.js": {
+   "cats": [
+    "5",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://wicky.nillia.ms/headroom.js/",
    "implies": null
   },
   "Heap": {
@@ -29305,6 +29493,20 @@
    "website": "https://acc.magixite.com",
    "implies": null
   },
+  "Magnific Popup": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://dimsemenov.com/plugins/magnific-popup/",
+   "implies": null
+  },
   "MailChimp": {
    "cats": [
     "32",
@@ -29357,6 +29559,20 @@
    "implies": [
     "MailChimp"
    ]
+  },
+  "Mailcheck": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://github.com/mailcheck/mailcheck",
+   "implies": null
   },
   "MailerLite": {
    "cats": [
@@ -31802,6 +32018,35 @@
    "website": "https://mopinion.com",
    "implies": null
   },
+  "Morphext": {
+   "cats": [
+    "25",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://morphext.fyianlai.com/",
+   "implies": null
+  },
+  "Morris.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://morrisjs.github.io/morris.js/",
+   "implies": null
+  },
   "Moshimo": {
    "cats": [
     "71"
@@ -31896,6 +32141,21 @@
    "scripts": null,
    "url": null,
    "website": "https://movabletype.org",
+   "implies": null
+  },
+  "Moxie": {
+   "cats": [
+    "5",
+    "68"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://github.com/moxiecode/moxie",
    "implies": null
   },
   "Mozard Suite": {
@@ -35097,6 +35357,20 @@
    "website": "https://www.orankl.com",
    "implies": null
   },
+  "Orbit Slider": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://zurb.com/playground/orbit-jquery-image-slider",
+   "implies": null
+  },
   "OrbitFox": {
    "cats": [
     "87",
@@ -35859,6 +36133,20 @@
    "website": "https://panelbear.com",
    "implies": null
   },
+  "Pannellum": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://pannellum.org/",
+   "implies": null
+  },
   "Pantheon": {
    "cats": [
     "62"
@@ -35881,6 +36169,21 @@
     "MariaDB",
     "Fastly"
    ]
+  },
+  "Paper.js": {
+   "cats": [
+    "25",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "http://paperjs.org/",
+   "implies": null
   },
   "Paradox": {
    "cats": [
@@ -37636,6 +37939,21 @@
    "implies": [
     "Laravel"
    ]
+  },
+  "Plupload": {
+   "cats": [
+    "5",
+    "68"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://www.plupload.com/",
+   "implies": null
   },
   "Plyr": {
    "cats": [
@@ -48161,6 +48479,20 @@
    "website": "https://steelhouse.com",
    "implies": null
   },
+  "Stellar.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://markdalgleish.com/projects/stellar.js/",
+   "implies": null
+  },
   "Stencil": {
    "cats": [
     "18"
@@ -48629,6 +48961,20 @@
    "scripts": null,
    "url": null,
    "website": "https://sucuri.net/",
+   "implies": null
+  },
+  "SugarJS": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://sugarjs.com/",
    "implies": null
   },
   "Suiteshare": {
@@ -52675,6 +53021,20 @@
     "PHP"
    ]
   },
+  "Typed.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://mattboldt.com/demos/typed-js/",
+   "implies": null
+  },
   "Typeform": {
    "cats": [
     "73"
@@ -55099,6 +55459,22 @@
    "website": "https://www.whmcs.com",
    "implies": null
   },
+  "WOW": {
+   "cats": [
+    "12",
+    "18",
+    "25"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://www.delac.io/WOW",
+   "implies": null
+  },
   "WP Automatic": {
    "cats": [
     "87"
@@ -55633,6 +56009,20 @@
    "scripts": null,
    "url": null,
    "website": "https://weavertheme.com",
+   "implies": null
+  },
+  "Web Font Loader": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://github.com/typekit/webfontloader",
    "implies": null
   },
   "Web Shop Manager": {
@@ -57037,6 +57427,7 @@
    "cookies": null,
    "headers": {
     "X-Pingback": "/xmlrpc\\.php$",
+    "X-Redirect-By": "WordPress",
     "link": "rel=\"https://api\\.w\\.org/\""
    },
    "meta": {
@@ -59511,6 +59902,35 @@
    "website": "https://bdok.ir",
    "implies": null
   },
+  "bowser": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://opencollective.com/bowser",
+   "implies": null
+  },
+  "bxSlider": {
+   "cats": [
+    "7",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://bxslider.com/",
+   "implies": null
+  },
   "cPanel": {
    "cats": [
     "9"
@@ -59731,6 +60151,21 @@
    "scripts": null,
    "url": null,
    "website": "https://github.com/deepwn/deepMiner",
+   "implies": null
+  },
+  "dimple": {
+   "cats": [
+    "25",
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "http://dimplejs.org/",
    "implies": null
   },
   "e-Shop Commerce": {
@@ -61209,6 +61644,20 @@
    "website": "https://mobicred.co.za/",
    "implies": null
   },
+  "mobile-detect.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://hgoebl.github.io/mobile-detect.js/doc/MobileDetect.html",
+   "implies": null
+  },
   "mod_auth_pam": {
    "cats": [
     "33"
@@ -61587,6 +62036,20 @@
    "implies": [
     "PHP"
    ]
+  },
+  "p5.js": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://p5js.org",
+   "implies": null
   },
   "papaya CMS": {
    "cats": [
@@ -62112,6 +62575,20 @@
    "website": "https://www.snigel.com/adengine/",
    "implies": null
   },
+  "spin.js": {
+   "cats": [
+    "25"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://spin.js.org/",
+   "implies": null
+  },
   "stores.jp": {
    "cats": [
     "6"
@@ -62447,6 +62924,20 @@
    "scripts": null,
    "url": null,
    "website": "https://www.wbuy.com.br",
+   "implies": null
+  },
+  "waitForImages": {
+   "cats": [
+    "59"
+   ],
+   "category_names": null,
+   "cookies": null,
+   "headers": null,
+   "meta": null,
+   "html": null,
+   "scripts": null,
+   "url": null,
+   "website": "https://github.com/alexanderdickson/waitForImages",
    "implies": null
   },
   "wap.store": {
