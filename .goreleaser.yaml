@@ -20,6 +20,7 @@ builds:
       - linux
       - windows
       - darwin
+    main: ./cmd/webanalyze
 
 archives:
   - format: tar.gz
