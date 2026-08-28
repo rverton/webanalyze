@@ -102,7 +102,7 @@ func (wa *WebAnalyzer) CategoryById(cid string) string {
 	return wa.appDefs.Cats[cid].Name
 }
 
-func fetchHost(urlStr string, client *http.Client) (*http.Response, error) {
+func fetchHost(urlStr string, client *http.Client, requestHeaders http.Header) (*http.Response, error) {
 	if client == nil {
 		client = &http.Client{
 			Timeout: timeout,
@@ -129,7 +129,17 @@ func fetchHost(urlStr string, client *http.Client) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Accept", "*/*")
+	req.Header = requestHeaders.Clone()
+	if req.Header == nil {
+		req.Header = make(http.Header)
+	}
+	if host := req.Header.Get("Host"); host != "" {
+		req.Host = host
+		req.Header.Del("Host")
+	}
+	if req.Header.Get("Accept") == "" {
+		req.Header.Set("Accept", "*/*")
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -227,7 +237,7 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 		headers = job.Headers
 		cookies = job.Cookies
 	} else {
-		resp, err := fetchHost(job.URL, wa.client)
+		resp, err := fetchHost(job.URL, wa.client, job.RequestHeaders)
 		if err != nil {
 			return nil, links, fmt.Errorf("Failed to retrieve: %w", err)
 		}

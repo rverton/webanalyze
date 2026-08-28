@@ -6,7 +6,7 @@ import (
 
 // Job may consist only of a URL, in which case webanalyse will
 // proceed to download from that URL, or it may consist of the
-// Body and Headers of a request to a URL and the URL itself,
+// response Body and Headers for a URL and the URL itself,
 // in which case these fields will be trusted and used for
 // analysis without further network traffic.
 // If a Job is constructed using the OfflineJob constructor
@@ -15,7 +15,8 @@ import (
 type Job struct {
 	URL              string
 	Body             []byte
-	Headers          http.Header //map[string][]string
+	Headers          http.Header // Response headers used for offline analysis
+	RequestHeaders   http.Header // Headers added to outbound HTTP requests
 	Cookies          []*http.Cookie
 	Crawl            int
 	SearchSubdomain  bool

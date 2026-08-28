@@ -2,12 +2,79 @@ package webanalyze
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/PuerkitoBio/goquery"
 )
+
+func TestProcessRequestHeaders(t *testing.T) {
+	var received http.Header
+	var receivedHost string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		received = r.Header.Clone()
+		receivedHost = r.Host
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	analyzer, err := NewWebAnalyzer(strings.NewReader(`{"technologies":{},"categories":{}}`), server.Client())
+	if err != nil {
+		t.Fatalf("cannot create analyzer: %v", err)
+	}
+
+	headers := http.Header{
+		"Accept":     []string{"text/html"},
+		"Host":       []string{"tenant.example"},
+		"User-Agent": []string{"custom-agent"},
+		"X-Custom":   []string{"first", "second"},
+	}
+	job := NewOnlineJob(server.URL, "", nil, 0, false, false)
+	job.RequestHeaders = headers
+	result, _ := analyzer.Process(job)
+	if result.Error != nil {
+		t.Fatalf("Process returned an error: %v", result.Error)
+	}
+
+	if got, want := received.Get("Accept"), "text/html"; got != want {
+		t.Errorf("got Accept header %q, want %q", got, want)
+	}
+	if got, want := received.Get("User-Agent"), "custom-agent"; got != want {
+		t.Errorf("got User-Agent header %q, want %q", got, want)
+	}
+	if got, want := receivedHost, "tenant.example"; got != want {
+		t.Errorf("got request host %q, want %q", got, want)
+	}
+	if got, want := received.Values("X-Custom"), []string{"first", "second"}; !slices.Equal(got, want) {
+		t.Errorf("got X-Custom headers %q, want %q", got, want)
+	}
+	if headers.Get("Accept") != "text/html" {
+		t.Error("Process modified the provided headers")
+	}
+}
+
+func TestFetchHostDefaultAcceptHeader(t *testing.T) {
+	var accept string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		accept = r.Header.Get("Accept")
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	defer server.Close()
+
+	resp, err := fetchHost(server.URL, nil, nil)
+	if err != nil {
+		t.Fatalf("fetchHost returned an error: %v", err)
+	}
+	resp.Body.Close()
+
+	if got, want := accept, "*/*"; got != want {
+		t.Errorf("got Accept header %q, want %q", got, want)
+	}
+}
 
 func TestParseLinks(t *testing.T) {
 

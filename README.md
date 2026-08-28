@@ -2,7 +2,8 @@
 
 This is a port of Wappalyzer in Go. This tool is designed to be performant and allows to test huge lists of hosts.
 
-Because Wappalyzer removed the public access to their app definitions, webanalyze currently loads definitions from [enthec](https://github.com/enthec/webappanalyzer).
+> [!NOTE]
+> Because Wappalyzer removed the public access to their app definitions, webanalyze currently loads definitions from [enthec](https://github.com/enthec/webappanalyzer).
 
 ## Installation and usage
 
@@ -14,6 +15,9 @@ Precompiled releases can be downloaded directly [here](https://github.com/rverto
 If you want to build for yourself:
 
     $ go install -v github.com/rverton/webanalyze/cmd/webanalyze@latest
+
+## Usage
+
     $ webanalyze -update # loads new technologies.json file from wappalyzer project
     $ webanalyze -h
     Usage of webanalyze:
@@ -21,6 +25,8 @@ If you want to build for yourself:
             app definition file. (default "technologies.json")
       -crawl int
             links to follow from the root page (default 0)
+      -header value
+            custom HTTP request header, repeatable (e.g. 'User-Agent: webanalyze')
       -host string
             single host to test
       -hosts string
@@ -36,8 +42,11 @@ If you want to build for yourself:
       -worker int
             number of worker (default 4)
 
+The `-update` flags downloads a current version of `technologies.json` from [enthec](https://github.com/enthec/webappanalyzer).
 
-The `-update` flags downloads a current version of `technologies.json` from the [wappalyzer repository](https://github.com/AliasIO/Wappalyzer) to the current folder.
+Custom request headers can be supplied more than once:
+
+    $ webanalyze -host example.com -header "User-Agent: Mozilla/5.0" -header "Authorization: Bearer token"
 
 ### Docker
 

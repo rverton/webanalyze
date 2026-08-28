@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,6 +31,7 @@ var (
 	searchSubdomain bool
 	silent          bool
 	redirect        bool
+	requestHeaders  = make(http.Header)
 	outputMu        sync.Mutex
 )
 
@@ -41,6 +43,9 @@ func init() {
 	flag.StringVar(&host, "host", "", "single host to test")
 	flag.StringVar(&hosts, "hosts", "", "filename with hosts, one host per line.")
 	flag.IntVar(&crawlCount, "crawl", 0, "links to follow from the root page (default 0)")
+	flag.Func("header", "custom HTTP request header, repeatable (e.g. 'User-Agent: webanalyze')", func(value string) error {
+		return addRequestHeader(requestHeaders, value)
+	})
 	flag.BoolVar(&searchSubdomain, "search", true, "searches all urls with same base domain (i.e. example.com and sub.example.com)")
 	flag.BoolVar(&silent, "silent", false, "avoid printing header (default false)")
 	flag.BoolVar(&redirect, "redirect", false, "follow http redirects (default false)")
@@ -143,11 +148,13 @@ func main() {
 
 			for host := range hosts {
 				job := webanalyze.NewOnlineJob(host, "", nil, crawlCount, searchSubdomain, redirect)
+				job.RequestHeaders = requestHeaders
 				result, links := wa.Process(job)
 
 				if searchSubdomain {
 					for _, v := range links {
 						crawlJob := webanalyze.NewOnlineJob(v, "", nil, 0, false, redirect)
+						crawlJob.RequestHeaders = requestHeaders
 						result, _ := wa.Process(crawlJob)
 						output(result, wa, outWriter)
 					}
@@ -168,6 +175,21 @@ func main() {
 
 	close(hosts)
 	wg.Wait()
+}
+
+func addRequestHeader(headers http.Header, value string) error {
+	name, headerValue, ok := strings.Cut(value, ":")
+	if !ok {
+		return fmt.Errorf("header %q must use the format 'Name: value'", value)
+	}
+
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return errors.New("header name cannot be empty")
+	}
+
+	headers.Add(name, strings.TrimSpace(headerValue))
+	return nil
 }
 
 func output(result webanalyze.Result, wa *webanalyze.WebAnalyzer, outWriter *csv.Writer) {

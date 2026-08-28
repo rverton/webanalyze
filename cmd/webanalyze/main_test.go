@@ -4,11 +4,44 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
+	"net/http"
+	"slices"
 	"sync"
 	"testing"
 
 	"github.com/rverton/webanalyze"
 )
+
+func TestAddRequestHeader(t *testing.T) {
+	headers := make(http.Header)
+
+	if err := addRequestHeader(headers, "Authorization: Bearer abc:def"); err != nil {
+		t.Fatalf("addRequestHeader returned an error: %v", err)
+	}
+	if err := addRequestHeader(headers, "X-Custom: first"); err != nil {
+		t.Fatalf("addRequestHeader returned an error: %v", err)
+	}
+	if err := addRequestHeader(headers, "X-Custom: second"); err != nil {
+		t.Fatalf("addRequestHeader returned an error: %v", err)
+	}
+
+	if got, want := headers.Get("Authorization"), "Bearer abc:def"; got != want {
+		t.Errorf("got Authorization header %q, want %q", got, want)
+	}
+	if got, want := headers.Values("X-Custom"), []string{"first", "second"}; !slices.Equal(got, want) {
+		t.Errorf("got X-Custom headers %q, want %q", got, want)
+	}
+}
+
+func TestAddRequestHeaderRejectsInvalidValues(t *testing.T) {
+	for _, value := range []string{"invalid", ": value"} {
+		t.Run(value, func(t *testing.T) {
+			if err := addRequestHeader(make(http.Header), value); err == nil {
+				t.Fatalf("addRequestHeader(%q) returned no error", value)
+			}
+		})
+	}
+}
 
 func TestConcurrentCSVOutput(t *testing.T) {
 	const (
