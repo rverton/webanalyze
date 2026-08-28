@@ -30,6 +30,7 @@ var (
 	searchSubdomain bool
 	silent          bool
 	redirect        bool
+	outputMu        sync.Mutex
 )
 
 func init() {
@@ -86,9 +87,16 @@ func main() {
 	// add header if output mode is csv
 	if outputMethod == "csv" {
 		outWriter = csv.NewWriter(os.Stdout)
-		outWriter.Write([]string{"Host", "Category", "App", "Version"})
+		if err := outWriter.Write([]string{"Host", "Category", "App", "Version"}); err != nil {
+			log.Fatalf("cannot write CSV header: %v", err)
+		}
 
-		defer outWriter.Flush()
+		defer func() {
+			outWriter.Flush()
+			if err := outWriter.Error(); err != nil {
+				log.Printf("cannot flush CSV output: %v", err)
+			}
+		}()
 
 	}
 
@@ -163,6 +171,9 @@ func main() {
 }
 
 func output(result webanalyze.Result, wa *webanalyze.WebAnalyzer, outWriter *csv.Writer) {
+	outputMu.Lock()
+	defer outputMu.Unlock()
+
 	if result.Error != nil {
 		fmt.Fprintf(os.Stderr, "%v error: %v\n", result.Host, result.Error)
 		return
@@ -187,16 +198,22 @@ func output(result webanalyze.Result, wa *webanalyze.WebAnalyzer, outWriter *csv
 
 	case "csv":
 		for _, m := range result.Matches {
-			outWriter.Write(
+			if err := outWriter.Write(
 				[]string{
 					result.Host,
 					strings.Join(m.CatNames, ","),
 					m.AppName,
 					m.Version,
 				},
-			)
+			); err != nil {
+				log.Printf("cannot write CSV output: %v", err)
+				return
+			}
 		}
 		outWriter.Flush()
+		if err := outWriter.Error(); err != nil {
+			log.Printf("cannot flush CSV output: %v", err)
+		}
 	case "json":
 
 		output := struct {
