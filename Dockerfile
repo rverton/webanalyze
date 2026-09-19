@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine AS build-env
+FROM golang:1.27.1-alpine AS build-env
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
