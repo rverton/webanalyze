@@ -285,6 +285,8 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 	}
 
 	scripts := doc.Find("script")
+    
+	bodyStr := string(body)
 
 	for appname, app := range appDefs.Apps {
 		// TODO: Reduce complexity in this for-loop by functionalising out
@@ -297,7 +299,7 @@ func (wa *WebAnalyzer) process(job *Job, appDefs *AppsDefinition) ([]Match, []st
 		}
 
 		// check raw html
-		if m, v := findMatches(string(body), app.HTMLRegex); len(m) > 0 {
+		if m, v := findMatches(bodyStr, app.HTMLRegex); len(m) > 0 {
 			findings.Matches = append(findings.Matches, m...)
 			findings.updateVersion(v)
 		}
